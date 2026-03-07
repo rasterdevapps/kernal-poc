@@ -33,7 +33,7 @@ public class CacheConfig {
     @Bean
     public CacheManager cacheManager() {
         final var cacheManager = new CaffeineCacheManager(
-                "domains", "dataElements", "tableDefinitions", "searchHelps");
+                "domains", "dataElements", "tableDefinitions", "searchHelps", "numberRanges");
         cacheManager.setCaffeine(Caffeine.newBuilder()
                 .maximumSize(MAX_CACHE_SIZE)
                 .expireAfterWrite(EXPIRE_AFTER_WRITE)
