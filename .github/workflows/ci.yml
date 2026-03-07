@@ -18,26 +18,24 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Set up JDK 25
+      # Gradle itself runs on Java 21 LTS (Groovy 3.x embedded in Gradle
+      # does not support Java 25 class files as the Gradle runtime JVM).
+      # The Java 25 toolchain declared in build.gradle is auto-provisioned
+      # by Gradle for compiling and testing the project source code.
+      - name: Set up JDK 21 (Gradle runtime)
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '25'
+          java-version: '21'
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build
-        run: ./gradlew build -x test --no-daemon
-
-      - name: Run tests
-        run: ./gradlew test --no-daemon
-
-      - name: Generate coverage report
-        run: ./gradlew jacocoTestReport --no-daemon
-
-      - name: Verify coverage thresholds
-        run: ./gradlew jacocoTestCoverageVerification --no-daemon
+      # A single `build` invocation compiles, tests, generates the JaCoCo
+      # report, and verifies the 100% coverage threshold via the `check`
+      # lifecycle task wired in build.gradle.
+      - name: Build, test and verify coverage
+        run: ./gradlew build --no-daemon
 
       - name: Upload test results
         if: always()
