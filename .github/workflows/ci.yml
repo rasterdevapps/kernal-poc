@@ -1,0 +1,52 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      # Gradle itself runs on Java 21 LTS (Groovy 3.x embedded in Gradle
+      # does not support Java 25 class files as the Gradle runtime JVM).
+      # The Java 25 toolchain declared in build.gradle is auto-provisioned
+      # by Gradle for compiling and testing the project source code.
+      - name: Set up JDK 21 (Gradle runtime)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # A single `build` invocation compiles, tests, generates the JaCoCo
+      # report, and verifies the 100% coverage threshold via the `check`
+      # lifecycle task wired in build.gradle.
+      - name: Build, test and verify coverage
+        run: ./gradlew build --no-daemon
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: build/reports/tests/test/
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: build/reports/jacoco/test/html/

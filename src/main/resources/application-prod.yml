@@ -1,0 +1,14 @@
+# Production profile — uses PostgreSQL 18
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/erp_kernel}
+    driver-class-name: org.postgresql.Driver
+    username: ${DATABASE_USERNAME:erp_kernel}
+    password: ${DATABASE_PASSWORD:}
+
+  h2:
+    console:
+      enabled: false
+
+  flyway:
+    locations: classpath:db/migration
