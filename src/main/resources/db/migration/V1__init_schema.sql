@@ -1,6 +1,7 @@
 -- V1__init_schema.sql
 -- Initial schema setup for ERP Kernel
--- Creates the schema_version tracking is handled by Flyway automatically.
+-- Creates the initial kernel_info table.
+-- Schema version tracking is handled by Flyway automatically.
 
 -- Placeholder: first migration to verify Flyway integration is working.
 -- Actual domain tables will be added in subsequent milestones.

@@ -10,10 +10,10 @@
 
 | # | Milestone | Description | Status |
 |---|-----------|-------------|--------|
-| 1.1 | **Project Scaffolding** | Initialize Spring Boot project with Java 25, configure Gradle/Maven build, establish package structure and consistent naming conventions. | 🔄 In Progress |
-| 1.2 | **Database Provisioning** | Set up PostgreSQL 18 for all non-local environments and H2DB for local development with profile-based switching. | 🔄 In Progress |
-| 1.3 | **DB Versioning** | Integrate Flyway or Liquibase for database schema versioning with migration scripts and rollback support. | 🔄 In Progress |
-| 1.4 | **CI/CD Pipeline** | Configure GitHub Actions workflows for build, test, static analysis, and deployment stages. | 🔄 In Progress |
+| 1.1 | **Project Scaffolding** | Initialize Spring Boot project with Java 25, configure Gradle/Maven build, establish package structure and consistent naming conventions. | ✅ Completed |
+| 1.2 | **Database Provisioning** | Set up PostgreSQL 18 for all non-local environments and H2DB for local development with profile-based switching. | ✅ Completed |
+| 1.3 | **DB Versioning** | Integrate Flyway or Liquibase for database schema versioning with migration scripts and rollback support. | ✅ Completed |
+| 1.4 | **CI/CD Pipeline** | Configure GitHub Actions workflows for build, test, static analysis, and deployment stages. | ✅ Completed |
 | 1.5 | **Development Environment Standards** | Define coding standards, branch strategy, PR templates, commit conventions, and ISO/IEC/IEEE 12207 & CMMI Level 5 process documentation to ensure consistency, traceability, and continuous improvement across contributors. | ✅ Completed |
 
 ---
