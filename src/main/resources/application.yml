@@ -32,6 +32,10 @@ erp:
     jwt:
       expiration-minutes: 60
       issuer: erp-kernel
+    rate-limit:
+      enabled: true
+      requests-per-second: 100
+      burst-capacity: 200
 
 springdoc:
   api-docs:
