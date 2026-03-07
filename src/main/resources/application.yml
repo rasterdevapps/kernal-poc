@@ -32,3 +32,11 @@ erp:
     jwt:
       expiration-minutes: 60
       issuer: erp-kernel
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
