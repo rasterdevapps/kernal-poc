@@ -4,9 +4,11 @@ import com.erp.kernel.ddic.dto.CreateTableDefinitionRequest;
 import com.erp.kernel.ddic.dto.TableDefinitionDto;
 import com.erp.kernel.ddic.model.SchemaLevel;
 import com.erp.kernel.ddic.service.TableDefinitionService;
+import com.erp.kernel.api.jwt.JwtTokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
@@ -30,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Tests for the {@link TableDefinitionController}.
  */
 @WebMvcTest(TableDefinitionController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class TableDefinitionControllerTest {
 
     @Autowired
@@ -40,6 +43,9 @@ class TableDefinitionControllerTest {
 
     @MockitoBean
     private TableDefinitionService tableDefinitionService;
+
+    @MockitoBean
+    private JwtTokenService jwtTokenService;
 
     @Test
     void shouldCreateTableDefinition_whenValidRequest() throws Exception {

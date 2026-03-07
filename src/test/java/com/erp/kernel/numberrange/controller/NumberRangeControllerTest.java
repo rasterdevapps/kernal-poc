@@ -9,9 +9,11 @@ import com.erp.kernel.numberrange.dto.NextNumberResponse;
 import com.erp.kernel.numberrange.dto.NumberRangeDto;
 import com.erp.kernel.numberrange.dto.NumberRangeIntervalDto;
 import com.erp.kernel.numberrange.service.NumberRangeService;
+import com.erp.kernel.api.jwt.JwtTokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -35,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Tests for {@link NumberRangeController}.
  */
 @WebMvcTest(NumberRangeController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class NumberRangeControllerTest {
 
     @Autowired
@@ -45,6 +48,9 @@ class NumberRangeControllerTest {
 
     @MockitoBean
     private NumberRangeService numberRangeService;
+
+    @MockitoBean
+    private JwtTokenService jwtTokenService;
 
     private static final String BASE_URL = "/api/v1/number-ranges";
 
