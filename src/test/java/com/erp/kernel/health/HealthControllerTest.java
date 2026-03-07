@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.erp.kernel.api.config.CorsProperties;
 
 /**
  * Tests for the {@link HealthController}.
@@ -24,6 +25,9 @@ class HealthControllerTest {
 
     @MockitoBean
     private JwtTokenService jwtTokenService;
+
+    @MockitoBean
+    private CorsProperties corsProperties;
 
     @Test
     void shouldReturnUpStatus_whenHealthEndpointCalled() throws Exception {

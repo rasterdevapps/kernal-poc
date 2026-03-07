@@ -29,6 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.erp.kernel.api.config.CorsProperties;
 
 /**
  * Tests for the {@link DomainController}.
@@ -45,6 +46,9 @@ class DomainControllerTest {
 
     @MockitoBean
     private DomainService domainService;
+
+    @MockitoBean
+    private CorsProperties corsProperties;
 
     @MockitoBean
     private JwtTokenService jwtTokenService;

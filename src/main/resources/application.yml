@@ -36,6 +36,20 @@ erp:
       enabled: true
       requests-per-second: 100
       burst-capacity: 200
+    cors:
+      allowed-origins:
+        - "*"
+      allowed-methods:
+        - GET
+        - POST
+        - PUT
+        - PATCH
+        - DELETE
+        - OPTIONS
+      allowed-headers:
+        - "*"
+      allow-credentials: false
+      max-age: 3600
 
 springdoc:
   api-docs:

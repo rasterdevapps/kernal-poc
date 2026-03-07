@@ -32,6 +32,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.erp.kernel.api.config.CorsProperties;
 
 /**
  * Tests for {@link NumberRangeController}.
@@ -48,6 +49,9 @@ class NumberRangeControllerTest {
 
     @MockitoBean
     private NumberRangeService numberRangeService;
+
+    @MockitoBean
+    private CorsProperties corsProperties;
 
     @MockitoBean
     private JwtTokenService jwtTokenService;
