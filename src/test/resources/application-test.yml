@@ -20,3 +20,8 @@ spring:
 erp:
   encryption:
     secret-key: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
+  security:
+    ldap:
+      enabled: false
+    sso:
+      enabled: false

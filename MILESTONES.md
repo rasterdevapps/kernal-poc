@@ -48,13 +48,13 @@
 
 | # | Milestone | Description | Status |
 |---|-----------|-------------|--------|
-| 4.1 | **LDAP Integration** | Integrate with LDAP/Active Directory for centralised user directory, authentication, and organisational unit management. | ⬜ Not Started |
-| 4.2 | **User, Role & Authorisation Management** | Build user management screens with role-based access control (RBAC), authorisation objects, and profile assignments similar to SAP SU01/PFCG. | ⬜ Not Started |
-| 4.3 | **Two-Factor Authentication (2FA)** | Support TOTP-based 2FA with authenticator apps (Google Authenticator, Microsoft Authenticator, etc.). | ⬜ Not Started |
-| 4.4 | **Passkeys & Hardware Keys** | Implement WebAuthn/FIDO2 support for passkey-based passwordless login and hardware security key authentication (e.g., YubiKey). | ⬜ Not Started |
-| 4.5 | **Single Sign-On (SSO)** | Enable SSO via SAML 2.0 and/or OpenID Connect to allow users to authenticate once and access multiple system components. | ⬜ Not Started |
-| 4.6 | **Login Policies** | Allow administrators to define and enforce login policies (password complexity, expiry, lockout, session timeout, IP restrictions) at user, group, and organisational unit levels. | ⬜ Not Started |
-| 4.7 | **Extensible Authentication Framework** | Design the authentication layer to be extensible for future standards and methods without requiring core changes. | ⬜ Not Started |
+| 4.1 | **LDAP Integration** | Integrate with LDAP/Active Directory for centralised user directory, authentication, and organisational unit management. | ✅ Completed |
+| 4.2 | **User, Role & Authorisation Management** | Build user management screens with role-based access control (RBAC), authorisation objects, and profile assignments similar to SAP SU01/PFCG. | ✅ Completed |
+| 4.3 | **Two-Factor Authentication (2FA)** | Support TOTP-based 2FA with authenticator apps (Google Authenticator, Microsoft Authenticator, etc.). | ✅ Completed |
+| 4.4 | **Passkeys & Hardware Keys** | Implement WebAuthn/FIDO2 support for passkey-based passwordless login and hardware security key authentication (e.g., YubiKey). | ✅ Completed |
+| 4.5 | **Single Sign-On (SSO)** | Enable SSO via SAML 2.0 and/or OpenID Connect to allow users to authenticate once and access multiple system components. | ✅ Completed |
+| 4.6 | **Login Policies** | Allow administrators to define and enforce login policies (password complexity, expiry, lockout, session timeout, IP restrictions) at user, group, and organisational unit levels. | ✅ Completed |
+| 4.7 | **Extensible Authentication Framework** | Design the authentication layer to be extensible for future standards and methods without requiring core changes. | ✅ Completed |
 
 ---
 

@@ -13,7 +13,8 @@ import java.time.Duration;
  * Configures Caffeine-based in-memory caching for frequently accessed master data.
  *
  * <p>Provides caches for DDIC entities (domains, data elements, table definitions, search helps)
- * with a maximum size of 1000 entries and 30-minute expiration after write.
+ * and security entities (users, roles, login policies) with a maximum size of 1000 entries
+ * and 30-minute expiration after write.
  */
 @Configuration
 @EnableCaching
@@ -33,7 +34,8 @@ public class CacheConfig {
     @Bean
     public CacheManager cacheManager() {
         final var cacheManager = new CaffeineCacheManager(
-                "domains", "dataElements", "tableDefinitions", "searchHelps", "numberRanges");
+                "domains", "dataElements", "tableDefinitions", "searchHelps", "numberRanges",
+                "users", "roles", "loginPolicies");
         cacheManager.setCaffeine(Caffeine.newBuilder()
                 .maximumSize(MAX_CACHE_SIZE)
                 .expireAfterWrite(EXPIRE_AFTER_WRITE)

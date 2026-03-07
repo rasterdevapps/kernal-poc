@@ -1,5 +1,8 @@
 package com.erp.kernel.ddic.exception;
 
+import com.erp.kernel.security.exception.AccountLockedException;
+import com.erp.kernel.security.exception.AuthenticationException;
+import com.erp.kernel.security.exception.AuthorizationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -71,6 +74,45 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleValidation(final ValidationException ex) {
         LOG.warn("Business validation failed: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(ex.getMessage()));
+    }
+
+    /**
+     * Handles authentication exceptions.
+     *
+     * @param ex the exception
+     * @return a 401 response with the error message
+     */
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthentication(final AuthenticationException ex) {
+        LOG.warn("Authentication failed: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ErrorResponse(ex.getMessage()));
+    }
+
+    /**
+     * Handles authorisation exceptions.
+     *
+     * @param ex the exception
+     * @return a 403 response with the error message
+     */
+    @ExceptionHandler(AuthorizationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthorization(final AuthorizationException ex) {
+        LOG.warn("Authorisation denied: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new ErrorResponse(ex.getMessage()));
+    }
+
+    /**
+     * Handles account locked exceptions.
+     *
+     * @param ex the exception
+     * @return a 423 response with the error message
+     */
+    @ExceptionHandler(AccountLockedException.class)
+    public ResponseEntity<ErrorResponse> handleAccountLocked(final AccountLockedException ex) {
+        LOG.warn("Account locked: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.LOCKED)
                 .body(new ErrorResponse(ex.getMessage()));
     }
 }
