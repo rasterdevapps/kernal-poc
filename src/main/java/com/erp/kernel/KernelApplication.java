@@ -2,6 +2,7 @@ package com.erp.kernel;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
 /**
  * Main entry point for the ERP Kernel application.
@@ -9,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * <p>Bootstraps the Spring Boot application context and starts the embedded server.
  */
 @SpringBootApplication
+@ConfigurationPropertiesScan
 public class KernelApplication {
 
     /**

@@ -16,6 +16,9 @@ spring:
 erp:
   encryption:
     secret-key: ${ENCRYPTION_SECRET_KEY:}
+  api:
+    jwt:
+      secret-key: ${JWT_SECRET_KEY:}
   security:
     ldap:
       enabled: ${LDAP_ENABLED:false}

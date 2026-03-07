@@ -19,6 +19,9 @@ spring:
 erp:
   encryption:
     secret-key: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
+  api:
+    jwt:
+      secret-key: ZXJwLWtlcm5lbC1kZXYta2V5LW11c3QtYmUtMzItYnl0ZXM=
   security:
     ldap:
       enabled: false

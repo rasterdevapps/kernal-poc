@@ -26,3 +26,9 @@ management:
   endpoint:
     health:
       show-details: when-authorized
+
+erp:
+  api:
+    jwt:
+      expiration-minutes: 60
+      issuer: erp-kernel

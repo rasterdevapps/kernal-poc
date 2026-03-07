@@ -2,6 +2,8 @@ package com.erp.kernel.sysvar;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.erp.kernel.api.jwt.JwtTokenService;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -18,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Tests for {@link SystemVariableController}.
  */
 @WebMvcTest(SystemVariableController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class SystemVariableControllerTest {
 
     @Autowired
@@ -25,6 +28,9 @@ class SystemVariableControllerTest {
 
     @MockitoBean
     private SystemVariableProvider systemVariableProvider;
+
+    @MockitoBean
+    private JwtTokenService jwtTokenService;
 
     @Test
     void shouldReturnAllVariables() throws Exception {
