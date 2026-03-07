@@ -12,3 +12,7 @@ spring:
 
   flyway:
     locations: classpath:db/migration
+
+erp:
+  encryption:
+    secret-key: ${ENCRYPTION_SECRET_KEY:}
