@@ -16,3 +16,18 @@ spring:
 erp:
   encryption:
     secret-key: ${ENCRYPTION_SECRET_KEY:}
+  security:
+    ldap:
+      enabled: ${LDAP_ENABLED:false}
+      url: ${LDAP_URL:}
+      base-dn: ${LDAP_BASE_DN:}
+      user-search-filter: ${LDAP_USER_SEARCH_FILTER:(uid={0})}
+      bind-dn: ${LDAP_BIND_DN:}
+      bind-password: ${LDAP_BIND_PASSWORD:}
+    sso:
+      enabled: ${SSO_ENABLED:false}
+      provider-type: ${SSO_PROVIDER_TYPE:}
+      issuer-uri: ${SSO_ISSUER_URI:}
+      client-id: ${SSO_CLIENT_ID:}
+      client-secret: ${SSO_CLIENT_SECRET:}
+      metadata-url: ${SSO_METADATA_URL:}
