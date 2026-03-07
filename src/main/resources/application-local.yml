@@ -13,3 +13,9 @@ spring:
 
   flyway:
     locations: classpath:db/migration
+
+# WARNING: Replace this key with a secure, randomly-generated key in production.
+# Never commit production keys to version control.
+erp:
+  encryption:
+    secret-key: dGVzdC1zZWNyZXQta2V5LTMyLWJ5dGVzLWxvbmch

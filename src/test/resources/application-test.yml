@@ -16,3 +16,7 @@ spring:
   h2:
     console:
       enabled: false
+
+erp:
+  encryption:
+    secret-key: dGVzdC1zZWNyZXQta2V5LTMyLWJ5dGVzLWxvbmch
