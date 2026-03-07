@@ -277,7 +277,25 @@ Always comply with the following SonarLint rule categories:
 
 ---
 
-## 6. Version Control Standards
+## 6. Milestone Tracking
+
+- **Every feature change must update `MILESTONES.md`** to reflect the current status of the affected milestone(s).
+- Use the following status indicators in the **Status** column of each milestone table:
+
+| Icon | Meaning |
+|------|---------|
+| ✅ | **Completed** — Milestone is fully implemented, tested, and merged. |
+| 🔄 | **In Progress** — Milestone is actively being worked on. |
+| ⬜ | **Not Started** — Milestone has not been started yet. |
+
+- When starting work on a milestone, set its status to 🔄 **In Progress**.
+- When the milestone is fully implemented with all tests passing and code merged, set its status to ✅ **Completed**.
+- Update the status in the same PR that delivers the feature change; do not defer milestone updates to a separate PR.
+- If a feature change partially completes a milestone, keep the status as 🔄 **In Progress** and add a note in the description.
+
+---
+
+## 7. Version Control Standards
 
 - Write clear, concise commit messages in the imperative mood (e.g., "Add user service", "Fix null pointer in order processing").
 - Each commit should represent a single logical change.
