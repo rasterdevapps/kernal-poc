@@ -22,12 +22,12 @@
 
 | # | Milestone | Description | Status |
 |---|-----------|-------------|--------|
-| 2.1 | **ANSI/SPARC Three-Schema Architecture** | Implement the three-schema model (External, Conceptual, Internal) for database abstraction, inspired by ABAP's Data Dictionary (DDIC). | ⬜ Not Started |
-| 2.2 | **Data Dictionary (DDIC) Service** | Build a metadata-driven data dictionary service that manages table definitions, domains, data elements, and search helps similar to SAP SE11. | ⬜ Not Started |
-| 2.3 | **Password-Protected Database Access** | Enforce credential-based database access controls so that clients cannot modify schemas or data directly; all access goes through the application layer. | ⬜ Not Started |
-| 2.4 | **Client Customisation via "Z" Fields** | Implement an extension mechanism allowing client-specific custom fields (prefixed with "Z") on standard tables without altering the core schema. | ⬜ Not Started |
-| 2.5 | **In-Memory Caching for Master Data** | Integrate an in-memory cache (e.g., Caffeine or Redis) for frequently accessed, rarely changing master data to reduce database load. | ⬜ Not Started |
-| 2.6 | **Encryption of Critical Data** | Encrypt sensitive information (patient data, financial records) at the application level before storage using AES-256 or equivalent, ensuring confidentiality even with direct DB access. | ⬜ Not Started |
+| 2.1 | **ANSI/SPARC Three-Schema Architecture** | Implement the three-schema model (External, Conceptual, Internal) for database abstraction, inspired by ABAP's Data Dictionary (DDIC). | ✅ Completed |
+| 2.2 | **Data Dictionary (DDIC) Service** | Build a metadata-driven data dictionary service that manages table definitions, domains, data elements, and search helps similar to SAP SE11. | ✅ Completed |
+| 2.3 | **Password-Protected Database Access** | Enforce credential-based database access controls so that clients cannot modify schemas or data directly; all access goes through the application layer. | ✅ Completed |
+| 2.4 | **Client Customisation via "Z" Fields** | Implement an extension mechanism allowing client-specific custom fields (prefixed with "Z") on standard tables without altering the core schema. | ✅ Completed |
+| 2.5 | **In-Memory Caching for Master Data** | Integrate an in-memory cache (e.g., Caffeine or Redis) for frequently accessed, rarely changing master data to reduce database load. | ✅ Completed |
+| 2.6 | **Encryption of Critical Data** | Encrypt sensitive information (patient data, financial records) at the application level before storage using AES-256 or equivalent, ensuring confidentiality even with direct DB access. | ✅ Completed |
 
 ---
 
