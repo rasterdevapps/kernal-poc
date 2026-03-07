@@ -14,7 +14,7 @@
 | 1.2 | **Database Provisioning** | Set up PostgreSQL 18 for all non-local environments and H2DB for local development with profile-based switching. | ⬜ Not Started |
 | 1.3 | **DB Versioning** | Integrate Flyway or Liquibase for database schema versioning with migration scripts and rollback support. | ⬜ Not Started |
 | 1.4 | **CI/CD Pipeline** | Configure GitHub Actions workflows for build, test, static analysis, and deployment stages. | ⬜ Not Started |
-| 1.5 | **Development Environment Standards** | Define coding standards, branch strategy, PR templates, and commit conventions to ensure consistency across contributors. | ✅ Completed |
+| 1.5 | **Development Environment Standards** | Define coding standards, branch strategy, PR templates, commit conventions, and ISO/IEC/IEEE 12207 & CMMI Level 5 process documentation to ensure consistency, traceability, and continuous improvement across contributors. | ✅ Completed |
 
 ---
 
@@ -114,6 +114,72 @@
 | 9.3 | **Framework Documentation** | Produce comprehensive developer documentation, architecture decision records (ADRs), and onboarding guides. | ⬜ Not Started |
 | 9.4 | **Multi-Vertical Readiness** | Validate the framework against at least two industry verticals (e.g., One Health + another) to confirm reusability and extensibility. | ⬜ Not Started |
 | 9.5 | **Performance & Scalability Benchmarking** | Conduct load testing and performance benchmarking; establish baseline metrics and tuning guidelines for production deployments. | ⬜ Not Started |
+
+---
+
+## Feature Completion Process (ISO/IEC/IEEE 12207 & CMMI Level 5)
+
+> Every milestone must follow this standardised completion process to comply with [ISO/IEC/IEEE 12207](https://en.wikipedia.org/wiki/ISO/IEC_12207) software lifecycle processes and [CMMI Level 5](https://en.wikipedia.org/wiki/Capability_Maturity_Model_Integration) optimizing practices.
+> Refer to `.github/copilot-instructions.md` Sections 8–10 for the full standards and checklist.
+
+### Required Artefacts per Milestone Completion
+
+| # | Artefact | Description | ISO 12207 Process | CMMI Practice |
+|---|----------|-------------|-------------------|---------------|
+| 1 | **GitHub Issue(s)** | All work items for the milestone captured as issues with acceptance criteria. | Stakeholder Needs & Requirements | Requirements Management |
+| 2 | **Design Documentation** | Architecture decisions, design rationale, and technical approach documented in ADRs, issues, or PR descriptions. | Architecture & Design | Technical Solution |
+| 3 | **Source Code** | Implementation following coding standards (Sections 1–3 of copilot-instructions.md), with Javadoc on all public APIs. | Implementation | Product Integration |
+| 4 | **Unit & Integration Tests** | 100% line and branch coverage for new code (JaCoCo). Tests follow Section 4 standards. | Verification | Verification |
+| 5 | **Peer Review** | At least one approved PR review verifying standards compliance, test coverage, and design alignment. | Review & Audit | Process & Product Quality Assurance |
+| 6 | **CI/CD Pipeline Pass** | All pipeline stages (build, test, static analysis) pass without failures. | Quality Assurance | Quantitative Process Management |
+| 7 | **Acceptance Validation** | Acceptance criteria verified and documented in the PR description. | Validation | Validation |
+| 8 | **Migration Scripts** | Database versioning scripts (Flyway/Liquibase) for any schema changes, with rollback support. | Transition | Configuration Management |
+| 9 | **Milestone Status Update** | `MILESTONES.md` updated to reflect ✅ Completed (or 🔄 with a note if partially complete). | Configuration Management | Configuration Management |
+| 10 | **Metrics & Lessons Learned** | Record test coverage %, build duration, defect count. Document lessons learned for continuous improvement. | Maintenance | Causal Analysis & Resolution |
+
+### Milestone Completion Workflow
+
+```
+1. PLAN        → Create GitHub issues with acceptance criteria
+                 Link issues to milestone
+                 Set milestone status to 🔄 In Progress
+                 Document design approach and risks
+
+2. DEVELOP     → Implement following coding standards
+                 Write tests (100% coverage)
+                 Create migration scripts (if needed)
+                 Add Javadoc documentation
+
+3. VERIFY      → Run full test suite
+                 Pass CI/CD pipeline
+                 Submit PR for peer review
+                 Verify acceptance criteria
+
+4. VALIDATE    → Reviewer approves PR
+                 All quality gates pass
+                 No critical findings
+
+5. TRANSITION  → Merge PR
+                 Update MILESTONES.md status to ✅
+                 Close related issues
+                 Update README.md (if applicable)
+
+6. IMPROVE     → Record metrics (coverage, build time, defects)
+                 Document lessons learned
+                 Propose process improvements (if any)
+```
+
+### Continuous Improvement Cycle (CMMI Level 5)
+
+After each milestone completion, the team must:
+
+1. **Analyse** — Review metrics collected during the milestone (defect density, test coverage trends, pipeline stability).
+2. **Identify** — Identify root causes of any defects, delays, or process friction encountered.
+3. **Improve** — Propose and implement process improvements (updated standards, new linting rules, enhanced CI checks).
+4. **Verify** — Confirm that improvements are effective in subsequent milestones.
+5. **Document** — Update `.github/copilot-instructions.md` and this file with any process changes.
+
+> This cycle ensures that each completed milestone contributes not only to the product but also to the maturity and efficiency of the development process itself.
 
 ---
 
