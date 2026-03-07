@@ -12,7 +12,7 @@
 - Use **PascalCase** for class and interface names (e.g., `UserService`, `OrderRepository`).
 - Use **camelCase** for method names, variable names, and parameter names (e.g., `getUserById`, `orderCount`).
 - Use **UPPER_SNAKE_CASE** for constants (e.g., `MAX_RETRY_COUNT`, `DEFAULT_TIMEOUT`).
-- Use **camelCase** for package names, all lowercase, no underscores (e.g., `com.erp.kernel.service`).
+- Use **all lowercase** for package names, no underscores or mixed case (e.g., `com.erp.kernel.service`).
 - Boolean variables and methods should read as predicates (e.g., `isActive`, `hasPermission`, `canExecute`).
 - Avoid single-character variable names except in short lambdas or loop indices (`i`, `j`, `k`).
 - Avoid generic names like `data`, `info`, `temp`, `obj`; prefer descriptive, domain-specific names.
