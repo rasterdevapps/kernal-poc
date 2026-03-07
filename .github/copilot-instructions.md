@@ -301,3 +301,124 @@ Always comply with the following SonarLint rule categories:
 - Each commit should represent a single logical change.
 - Use feature branches with the naming pattern: `feature/<short-description>`, `bugfix/<short-description>`, `hotfix/<short-description>`.
 - All code must pass linting, build, and tests before merging.
+
+---
+
+## 8. ISO/IEC/IEEE 12207 — Software Lifecycle Processes
+
+> **Reference:** [ISO/IEC/IEEE 12207:2017](https://en.wikipedia.org/wiki/ISO/IEC_12207) — Systems and software engineering — Software life cycle processes.
+
+All feature development must comply with the following ISO/IEC/IEEE 12207 process areas. Each process area maps to activities that must be evidenced before a feature is considered complete.
+
+### 8.1 Technical Processes
+
+| Process | Required Activities |
+|---------|-------------------|
+| **Stakeholder Needs & Requirements** | Capture requirements in the GitHub issue before development begins. Acceptance criteria must be defined and traceable. |
+| **System/Software Requirements Analysis** | Translate stakeholder needs into technical requirements documented in the issue or linked design document. |
+| **Architecture & Design** | Document design decisions in code comments, ADRs (Architecture Decision Records), or the PR description. Ensure alignment with the layered architecture (Controller → Service → Repository). |
+| **Implementation** | Follow all coding standards defined in Sections 1–3 of this document. All code must pass static analysis (SonarLint) and compile without warnings. |
+| **Integration** | Ensure new code integrates with existing modules without breaking changes. Run the full test suite before merging. |
+| **Verification** | Achieve 100% line and branch coverage (Section 4). All tests must pass. Perform peer code review on every PR. |
+| **Validation** | Confirm the implementation satisfies the original acceptance criteria. Demonstrate functionality in the PR description or linked artefact. |
+| **Transition** | Update deployment configuration, migration scripts, and environment-specific settings as needed. Ensure backward compatibility. |
+| **Maintenance** | Document known limitations or technical debt in GitHub issues. Update `MILESTONES.md` and `README.md` as required. |
+
+### 8.2 Agreement & Organisational Processes
+
+| Process | Required Activities |
+|---------|-------------------|
+| **Configuration Management** | Use Git for version control. Follow branch and commit conventions (Section 7). Tag releases appropriately. |
+| **Quality Assurance** | Enforce coding standards via automated linting, static analysis, and CI/CD pipeline checks. Every PR must pass all quality gates before merge. |
+| **Review & Audit** | Every PR must have at least one peer review. Reviewers must verify compliance with coding standards, test coverage, and design principles. |
+| **Decision Management** | Record significant technical decisions as ADRs or in PR descriptions. Reference the relevant milestone and issue number. |
+| **Risk Management** | Identify and document risks (security, performance, compatibility) in the PR description. Mitigate risks before merging or log them as follow-up issues. |
+
+### 8.3 Traceability Requirements
+
+- Every commit must reference a GitHub issue number (e.g., `Fix #42: Add user validation`).
+- Every PR must link to the milestone it advances in `MILESTONES.md`.
+- Every requirement must be traceable from issue → design → implementation → test → deployment.
+- Maintain a clear audit trail: issue creation → branch → commits → PR → review → merge → milestone update.
+
+---
+
+## 9. CMMI Level 5 — Continuous Process Improvement
+
+> **Reference:** CMMI Level 5 (Optimizing) requires quantitative process management, causal analysis, and continuous improvement across all process areas.
+
+### 9.1 Quantitative Process Management
+
+- **Measure build and test metrics:** Track build duration, test pass rate, test coverage percentage, and defect density per feature.
+- **Monitor CI/CD pipeline health:** Record pipeline success/failure rates and mean time to resolution for pipeline failures.
+- **Track code quality trends:** Use SonarLint/SonarQube dashboards to monitor code smell count, bug count, vulnerability count, and technical debt over time.
+- **Measure review turnaround:** Track the time from PR creation to first review and from first review to merge.
+
+### 9.2 Causal Analysis & Resolution (CAR)
+
+- **Root cause analysis for defects:** When a bug is found in production or during testing, perform root cause analysis and document findings in the issue.
+- **Preventive actions:** After identifying a root cause, implement preventive measures (additional tests, linting rules, process changes) and document them.
+- **Post-incident reviews:** Conduct post-incident reviews for critical failures. Document the timeline, root cause, impact, resolution, and preventive actions.
+- **Defect pattern tracking:** Categorise defects by type (logic error, null pointer, concurrency, security) and identify recurring patterns for targeted improvement.
+
+### 9.3 Organisational Performance Management (OPM)
+
+- **Process improvement proposals:** Any team member may propose process improvements via GitHub issues labelled `process-improvement`.
+- **Retrospective actions:** Regularly review development processes and update this document, `MILESTONES.md`, and CI/CD workflows based on lessons learned.
+- **Standards evolution:** Update coding standards, testing practices, and review checklists based on defect analysis and industry best practices.
+- **Knowledge sharing:** Document reusable patterns, common pitfalls, and architectural decisions in the project wiki or ADRs.
+
+### 9.4 Process & Product Quality Assurance (PPQA)
+
+- **Compliance audits:** Periodically audit PRs and code against the standards defined in this document. Document audit results and corrective actions.
+- **Quality gates:** Every feature must pass the following quality gates before merge:
+  1. All automated tests pass (unit, integration).
+  2. 100% line and branch coverage for new code (JaCoCo).
+  3. Zero critical or major SonarLint findings.
+  4. At least one peer review approval.
+  5. PR description includes acceptance criteria verification.
+  6. `MILESTONES.md` updated to reflect current status.
+- **Continuous improvement of quality gates:** Review and enhance quality gate criteria quarterly based on defect analysis and process metrics.
+
+---
+
+## 10. Feature Completion Checklist
+
+> Every feature must satisfy all items in this checklist before the PR is merged. This checklist combines ISO/IEC/IEEE 12207 and CMMI Level 5 requirements into a single actionable process.
+
+### 10.1 Pre-Development
+
+- [ ] GitHub issue created with clear description and acceptance criteria.
+- [ ] Issue linked to the relevant milestone in `MILESTONES.md`.
+- [ ] Design approach documented (in issue, ADR, or PR description).
+- [ ] Risks identified and documented (security, performance, compatibility).
+- [ ] Milestone status set to 🔄 **In Progress** in `MILESTONES.md`.
+
+### 10.2 During Development
+
+- [ ] Code follows all standards in Sections 1–3 (naming, structure, Spring Boot conventions).
+- [ ] All new code has Javadoc comments on public classes and methods (Section 5).
+- [ ] Unit tests written following Section 4 standards (AAA pattern, descriptive names).
+- [ ] 100% line and branch coverage achieved for new code.
+- [ ] No critical or major SonarLint findings introduced.
+- [ ] Database migration scripts added if schema changes are required.
+- [ ] Configuration externalised (no hard-coded environment-specific values).
+
+### 10.3 Pre-Merge Review
+
+- [ ] All automated tests pass (`./gradlew test jacocoTestReport jacocoTestCoverageVerification`).
+- [ ] CI/CD pipeline passes all stages (build, test, static analysis).
+- [ ] PR description includes: summary of changes, acceptance criteria verification, and risk assessment.
+- [ ] At least one peer review completed and approved.
+- [ ] Reviewer verified compliance with coding standards and test coverage.
+- [ ] Commit messages follow conventions (imperative mood, issue reference).
+- [ ] No unnecessary files committed (build artefacts, IDE settings, temporary files).
+
+### 10.4 Post-Merge
+
+- [ ] `MILESTONES.md` updated — milestone status set to ✅ **Completed** (or remains 🔄 if partially complete with a note).
+- [ ] Related GitHub issues closed with a reference to the merged PR.
+- [ ] Deployment configuration updated if required.
+- [ ] `README.md` updated if the change affects project setup, architecture, or usage.
+- [ ] Lessons learned documented (if applicable) for continuous improvement (Section 9).
+- [ ] Metrics recorded: test coverage, build duration, defect count (Section 9.1).
