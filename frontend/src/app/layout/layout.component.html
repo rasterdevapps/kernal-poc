@@ -1,0 +1,10 @@
+<div class="layout">
+  <app-header (tcodeSubmitted)="onTCodeSubmitted($event)" />
+  <div class="layout-body">
+    <app-sidebar />
+    <main class="layout-content">
+      <router-outlet />
+    </main>
+  </div>
+  <app-footer />
+</div>

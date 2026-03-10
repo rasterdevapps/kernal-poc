@@ -74,11 +74,11 @@
 
 | # | Milestone | Description | Status |
 |---|-----------|-------------|--------|
-| 6.1 | **Angular Web Application Shell** | Build the Angular application shell with theming, internationalisation (i18n), and responsive layout. | ⬜ Not Started |
-| 6.2 | **T-Code Style Navigation** | Implement SAP T-code style shortcuts — a command field allowing users to type short codes to navigate directly to screens (preferably 4-character codes for frequent screens, longer codes permitted). | ⬜ Not Started |
-| 6.3 | **Consistent Naming Template** | Define and enforce a naming convention for all screens, components, APIs, and T-codes to maintain uniformity across the system. | ⬜ Not Started |
-| 6.4 | **System Administration Screens** | Develop administration screens for database management, number range management, user management, authorisation management, and system configuration. | ⬜ Not Started |
-| 6.5 | **Favourites, Recent & Personalisation** | Allow users to save favourite T-codes, view recent navigation history, and personalise their home screen and layout. | ⬜ Not Started |
+| 6.1 | **Angular Web Application Shell** | Build the Angular application shell with theming, internationalisation (i18n), and responsive layout. | 🔄 In Progress |
+| 6.2 | **T-Code Style Navigation** | Implement SAP T-code style shortcuts — a command field allowing users to type short codes to navigate directly to screens (preferably 4-character codes for frequent screens, longer codes permitted). | 🔄 In Progress |
+| 6.3 | **Consistent Naming Template** | Define and enforce a naming convention for all screens, components, APIs, and T-codes to maintain uniformity across the system. | 🔄 In Progress |
+| 6.4 | **System Administration Screens** | Develop administration screens for database management, number range management, user management, authorisation management, and system configuration. | 🔄 In Progress |
+| 6.5 | **Favourites, Recent & Personalisation** | Allow users to save favourite T-codes, view recent navigation history, and personalise their home screen and layout. | 🔄 In Progress |
 
 ---
 

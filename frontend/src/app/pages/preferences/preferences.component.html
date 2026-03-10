@@ -1,0 +1,79 @@
+<div class="page">
+  <div class="page-header">
+    <h1>User Preferences</h1>
+    <p class="subtitle">Customize your ERP Kernel experience</p>
+  </div>
+
+  @if (loading()) {
+    <div class="loading">Loading preferences...</div>
+  } @else {
+    <div class="preferences-card">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="form-section">
+          <h2>Appearance</h2>
+          <div class="form-group">
+            <label for="themeId">Theme</label>
+            <select id="themeId" formControlName="themeId">
+              <option [value]="null">Default</option>
+              @for (theme of themes(); track theme.id) {
+                <option [value]="theme.id">{{ theme.themeName }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h2>Regional</h2>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="locale">Locale</label>
+              <select id="locale" formControlName="locale">
+                @for (loc of locales; track loc) {
+                  <option [value]="loc">{{ loc }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="dateFormat">Date Format</label>
+              <select id="dateFormat" formControlName="dateFormat">
+                @for (fmt of dateFormats; track fmt) {
+                  <option [value]="fmt">{{ fmt }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="timeFormat">Time Format</label>
+              <select id="timeFormat" formControlName="timeFormat">
+                @for (fmt of timeFormats; track fmt) {
+                  <option [value]="fmt">{{ fmt }}</option>
+                }
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h2>Display</h2>
+          <div class="form-group">
+            <label for="itemsPerPage">Items Per Page</label>
+            <input id="itemsPerPage" type="number" formControlName="itemsPerPage" min="5" max="100" />
+            <span class="hint">Range: 5–100</span>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving()">
+            @if (saving()) {
+              Saving...
+            } @else {
+              Save Preferences
+            }
+          </button>
+          @if (saved()) {
+            <span class="save-success">✓ Preferences saved successfully</span>
+          }
+        </div>
+      </form>
+    </div>
+  }
+</div>

@@ -1,0 +1,124 @@
+.sidebar {
+  width: 240px;
+  min-width: 240px;
+  background: #fff;
+  border-right: 1px solid #e0e0e0;
+  height: 100%;
+  overflow-y: auto;
+  transition: width 0.2s ease, min-width 0.2s ease;
+  display: flex;
+  flex-direction: column;
+
+  &.collapsed {
+    width: 48px;
+    min-width: 48px;
+  }
+}
+
+.sidebar-toggle {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.toggle-btn {
+  border: none;
+  background: transparent;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  transition: background 0.2s, color 0.2s;
+
+  &:hover {
+    background: #f0f0f0;
+    color: #354a5f;
+  }
+}
+
+.sidebar-content {
+  flex: 1;
+  padding: 8px 0;
+}
+
+.nav-section {
+  margin-bottom: 4px;
+}
+
+.section-title {
+  padding: 8px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #8c9bab;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+
+  &.clickable {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #354a5f;
+    }
+  }
+}
+
+.chevron {
+  font-size: 10px;
+  transition: transform 0.2s;
+
+  &.expanded {
+    transform: rotate(90deg);
+  }
+}
+
+.nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px 8px 20px;
+  color: #444;
+  text-decoration: none;
+  font-size: 13px;
+  transition: background 0.15s, color 0.15s;
+  border-left: 3px solid transparent;
+
+  &:hover {
+    background: #f4f7fb;
+    color: #1a6fb5;
+  }
+
+  &.active {
+    background: #e8f0fe;
+    color: #1a6fb5;
+    border-left-color: #1a6fb5;
+    font-weight: 500;
+  }
+}
+
+.nav-icon {
+  font-size: 14px;
+  width: 20px;
+  text-align: center;
+}
+
+.nav-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

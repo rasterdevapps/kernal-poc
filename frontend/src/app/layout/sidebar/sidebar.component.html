@@ -1,0 +1,50 @@
+<aside class="sidebar" [class.collapsed]="collapsed()">
+  <div class="sidebar-toggle">
+    <button (click)="toggleCollapse()" class="toggle-btn" aria-label="Toggle sidebar">
+      @if (collapsed()) {
+        <span>▶</span>
+      } @else {
+        <span>◀</span>
+      }
+    </button>
+  </div>
+
+  @if (!collapsed()) {
+    <div class="sidebar-content">
+      <div class="nav-section">
+        <div class="section-title">Favourites</div>
+        <ul class="nav-list">
+          @for (item of favourites; track item.route) {
+            <li>
+              <a [routerLink]="item.route" routerLinkActive="active" class="nav-item">
+                <span class="nav-icon">{{ item.icon }}</span>
+                <span class="nav-label">{{ item.label }}</span>
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
+
+      @for (group of navGroups; track group.title) {
+        <div class="nav-section">
+          <button class="section-title clickable" (click)="toggleGroup(group)">
+            <span>{{ group.title }}</span>
+            <span class="chevron" [class.expanded]="group.expanded">▸</span>
+          </button>
+          @if (group.expanded) {
+            <ul class="nav-list">
+              @for (item of group.items; track item.route) {
+                <li>
+                  <a [routerLink]="item.route" routerLinkActive="active" class="nav-item">
+                    <span class="nav-icon">{{ item.icon }}</span>
+                    <span class="nav-label">{{ item.label }}</span>
+                  </a>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      }
+    </div>
+  }
+</aside>

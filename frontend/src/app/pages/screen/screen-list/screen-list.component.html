@@ -1,0 +1,95 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Screen Management</h1>
+      <p class="subtitle">Manage application screens and their configurations</p>
+    </div>
+    <button class="btn btn-primary" (click)="openCreateForm()">+ Create Screen</button>
+  </div>
+
+  @if (showForm()) {
+    <div class="form-card">
+      <h2>{{ editingId() !== null ? 'Edit' : 'Create' }} Screen</h2>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="screenId">Screen ID</label>
+            <input id="screenId" formControlName="screenId" placeholder="e.g. SCR001" />
+          </div>
+          <div class="form-group">
+            <label for="title">Title</label>
+            <input id="title" formControlName="title" placeholder="Screen title" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="description">Description</label>
+          <input id="description" formControlName="description" placeholder="Optional description" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="module">Module</label>
+            <input id="module" formControlName="module" placeholder="e.g. USER" />
+          </div>
+          <div class="form-group">
+            <label for="screenType">Screen Type</label>
+            <input id="screenType" formControlName="screenType" placeholder="e.g. LIST, FORM, DETAIL" />
+          </div>
+          <div class="form-group">
+            <label for="tcodeId">T-Code ID</label>
+            <input id="tcodeId" type="number" formControlName="tcodeId" placeholder="Optional" />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Save</button>
+          <button type="button" class="btn btn-secondary" (click)="cancelForm()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <div class="filter-bar">
+    <input
+      type="text"
+      class="filter-input"
+      placeholder="Filter by module..."
+      [value]="moduleFilter()"
+      (input)="onModuleFilterChange($event)"
+    />
+  </div>
+
+  @if (loading()) {
+    <div class="loading">Loading screens...</div>
+  } @else if (filteredScreens().length === 0) {
+    <div class="empty-state">No screens found.</div>
+  } @else {
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Screen ID</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Module</th>
+            <th>Type</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (screen of filteredScreens(); track screen.id) {
+            <tr>
+              <td class="code-cell">{{ screen.screenId }}</td>
+              <td class="name-cell">{{ screen.title }}</td>
+              <td>{{ screen.description }}</td>
+              <td><span class="badge">{{ screen.module }}</span></td>
+              <td><span class="type-badge">{{ screen.screenType }}</span></td>
+              <td class="actions-cell">
+                <button class="btn-icon" (click)="openEditForm(screen)" title="Edit">✏️</button>
+                <button class="btn-icon danger" (click)="deleteScreen(screen.id)" title="Delete">🗑️</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

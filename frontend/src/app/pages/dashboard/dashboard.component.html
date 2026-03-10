@@ -1,0 +1,41 @@
+<div class="dashboard">
+  <div class="dashboard-header">
+    <h1>Dashboard</h1>
+    <p class="subtitle">Welcome to ERP Kernel — your enterprise resource planning command center.</p>
+  </div>
+
+  <section class="quick-access">
+    <h2>Quick Access</h2>
+    <div class="tile-grid">
+      @for (tile of quickTiles; track tile.route) {
+        <a [routerLink]="tile.route" class="tile">
+          <span class="tile-icon">{{ tile.icon }}</span>
+          <span class="tile-label">{{ tile.label }}</span>
+          <span class="tile-desc">{{ tile.description }}</span>
+        </a>
+      }
+    </div>
+  </section>
+
+  <section class="recent-tcodes">
+    <h2>Active T-Codes</h2>
+    @if (loading()) {
+      <div class="loading">Loading...</div>
+    } @else if (tcodes().length === 0) {
+      <div class="empty-state">
+        <p>No active T-Codes found. Create your first T-Code to get started.</p>
+        <a routerLink="/admin/tcodes" class="btn btn-primary">Manage T-Codes</a>
+      </div>
+    } @else {
+      <div class="tcode-cards">
+        @for (tcode of tcodes(); track tcode.id) {
+          <div class="tcode-card">
+            <div class="tcode-code">{{ tcode.code }}</div>
+            <div class="tcode-desc">{{ tcode.description }}</div>
+            <div class="tcode-module">{{ tcode.module }}</div>
+          </div>
+        }
+      </div>
+    }
+  </section>
+</div>

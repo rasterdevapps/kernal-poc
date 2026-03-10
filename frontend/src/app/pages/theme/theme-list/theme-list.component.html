@@ -1,0 +1,109 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Theme Management</h1>
+      <p class="subtitle">Manage application themes and color schemes</p>
+    </div>
+    <button class="btn btn-primary" (click)="openCreateForm()">+ Create Theme</button>
+  </div>
+
+  @if (showForm()) {
+    <div class="form-card">
+      <h2>{{ editingId() !== null ? 'Edit' : 'Create' }} Theme</h2>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="themeName">Theme Name</label>
+            <input id="themeName" formControlName="themeName" placeholder="e.g. Corporate Blue" />
+          </div>
+          <div class="form-group">
+            <label for="description">Description</label>
+            <input id="description" formControlName="description" placeholder="Optional description" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="primaryColor">Primary Color</label>
+            <div class="color-input-wrapper">
+              <input id="primaryColor" type="color" formControlName="primaryColor" />
+              <span class="color-value">{{ form.get('primaryColor')?.value }}</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="secondaryColor">Secondary Color</label>
+            <div class="color-input-wrapper">
+              <input id="secondaryColor" type="color" formControlName="secondaryColor" />
+              <span class="color-value">{{ form.get('secondaryColor')?.value }}</span>
+            </div>
+          </div>
+          <div class="form-group checkbox-group">
+            <label>
+              <input type="checkbox" formControlName="isDefault" />
+              Set as default
+            </label>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Save</button>
+          <button type="button" class="btn btn-secondary" (click)="cancelForm()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="loading">Loading themes...</div>
+  } @else if (themes().length === 0) {
+    <div class="empty-state">No themes found.</div>
+  } @else {
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Primary</th>
+            <th>Secondary</th>
+            <th>Default</th>
+            <th>Active</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (theme of themes(); track theme.id) {
+            <tr>
+              <td class="name-cell">{{ theme.themeName }}</td>
+              <td>{{ theme.description }}</td>
+              <td>
+                <div class="color-preview">
+                  <span class="color-swatch" [style.background]="theme.primaryColor"></span>
+                  <span class="color-hex">{{ theme.primaryColor }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="color-preview">
+                  <span class="color-swatch" [style.background]="theme.secondaryColor"></span>
+                  <span class="color-hex">{{ theme.secondaryColor }}</span>
+                </div>
+              </td>
+              <td>
+                @if (theme.isDefault) {
+                  <span class="badge default">Default</span>
+                }
+              </td>
+              <td>
+                <span class="status" [class.active]="theme.active" [class.inactive]="!theme.active">
+                  {{ theme.active ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+              <td class="actions-cell">
+                <button class="btn-icon" (click)="openEditForm(theme)" title="Edit">✏️</button>
+                <button class="btn-icon danger" (click)="deleteTheme(theme.id)" title="Delete">🗑️</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
