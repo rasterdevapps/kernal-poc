@@ -20,7 +20,9 @@ export class LayoutComponent {
 
   onTCodeSubmitted(code: string): void {
     this.router.navigate(['/dashboard'], { queryParams: { tcode: code } });
-    this.mobileSidebarOpen.set(false);
+    if (this.breakpoint.isMobile() || this.breakpoint.isTablet()) {
+      this.mobileSidebarOpen.set(false);
+    }
   }
 
   toggleMobileSidebar(): void {
