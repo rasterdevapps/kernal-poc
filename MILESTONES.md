@@ -74,11 +74,11 @@
 
 | # | Milestone | Description | Status |
 |---|-----------|-------------|--------|
-| 6.1 | **Angular Web Application Shell** | Build the Angular application shell with theming, internationalisation (i18n), and responsive layout. | 🔄 In Progress |
-| 6.2 | **T-Code Style Navigation** | Implement SAP T-code style shortcuts — a command field allowing users to type short codes to navigate directly to screens (preferably 4-character codes for frequent screens, longer codes permitted). | 🔄 In Progress |
-| 6.3 | **Consistent Naming Template** | Define and enforce a naming convention for all screens, components, APIs, and T-codes to maintain uniformity across the system. | 🔄 In Progress |
-| 6.4 | **System Administration Screens** | Develop administration screens for database management, number range management, user management, authorisation management, and system configuration. | 🔄 In Progress |
-| 6.5 | **Favourites, Recent & Personalisation** | Allow users to save favourite T-codes, view recent navigation history, and personalise their home screen and layout. | 🔄 In Progress |
+| 6.1 | **Angular Web Application Shell** | Build the Angular application shell with theming, internationalisation (i18n), and responsive layout. | ✅ Completed |
+| 6.2 | **T-Code Style Navigation** | Implement SAP T-code style shortcuts — a command field allowing users to type short codes to navigate directly to screens (preferably 4-character codes for frequent screens, longer codes permitted). | ✅ Completed |
+| 6.3 | **Consistent Naming Template** | Define and enforce a naming convention for all screens, components, APIs, and T-codes to maintain uniformity across the system. | ✅ Completed |
+| 6.4 | **System Administration Screens** | Develop administration screens for database management, number range management, user management, authorisation management, and system configuration. | ✅ Completed |
+| 6.5 | **Favourites, Recent & Personalisation** | Allow users to save favourite T-codes, view recent navigation history, and personalise their home screen and layout. | ✅ Completed |
 
 ---
 
@@ -86,10 +86,10 @@
 
 | # | Milestone | Description | Status |
 |---|-----------|-------------|--------|
-| 7.1 | **Mobile App Framework Selection** | Evaluate and select a cross-platform framework (e.g., Flutter, React Native, or native) for mobile and tablet applications. | ⬜ Not Started |
-| 7.2 | **Mobile App for Specialised Workflows** | Develop mobile applications for field-specific workflows (e.g., inventory scanning, patient check-in, on-site inspections). | ⬜ Not Started |
-| 7.3 | **Tablet App for Specialised Workflows** | Develop tablet-optimised applications for workflows benefiting from larger screens (e.g., clinical dashboards, reporting, approvals). | ⬜ Not Started |
-| 7.4 | **Offline Capability & Sync** | Enable offline data capture and automatic synchronisation when connectivity is restored. | ⬜ Not Started |
+| 7.1 | **Mobile App Framework Selection** | Evaluate and select a cross-platform framework (e.g., Flutter, React Native, or native) for mobile and tablet applications. | ✅ Completed |
+| 7.2 | **Mobile App for Specialised Workflows** | Develop mobile applications for field-specific workflows (e.g., inventory scanning, patient check-in, on-site inspections). | ✅ Completed |
+| 7.3 | **Tablet App for Specialised Workflows** | Develop tablet-optimised applications for workflows benefiting from larger screens (e.g., clinical dashboards, reporting, approvals). | ✅ Completed |
+| 7.4 | **Offline Capability & Sync** | Enable offline data capture and automatic synchronisation when connectivity is restored. | ✅ Completed |
 
 ---
 

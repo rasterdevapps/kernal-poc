@@ -16,7 +16,7 @@
         <ul class="nav-list">
           @for (item of favourites; track item.route) {
             <li>
-              <a [routerLink]="item.route" routerLinkActive="active" class="nav-item">
+              <a [routerLink]="item.route" routerLinkActive="active" class="nav-item" (click)="onNavItemClick()">
                 <span class="nav-icon">{{ item.icon }}</span>
                 <span class="nav-label">{{ item.label }}</span>
               </a>
@@ -35,7 +35,7 @@
             <ul class="nav-list">
               @for (item of group.items; track item.route) {
                 <li>
-                  <a [routerLink]="item.route" routerLinkActive="active" class="nav-item">
+                  <a [routerLink]="item.route" routerLinkActive="active" class="nav-item" (click)="onNavItemClick()">
                     <span class="nav-icon">{{ item.icon }}</span>
                     <span class="nav-label">{{ item.label }}</span>
                   </a>

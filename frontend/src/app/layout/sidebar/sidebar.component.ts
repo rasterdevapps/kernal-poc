@@ -1,5 +1,6 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, output, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { BreakpointService } from '../../services/breakpoint.service';
 
 interface NavItem {
   label: string;
@@ -21,6 +22,8 @@ interface NavGroup {
   styleUrl: './sidebar.component.scss'
 })
 export class SidebarComponent {
+  readonly breakpoint = inject(BreakpointService);
+  readonly navigationSelected = output<void>();
   readonly collapsed = signal(false);
 
   readonly favourites: NavItem[] = [
@@ -53,5 +56,11 @@ export class SidebarComponent {
 
   toggleGroup(group: NavGroup): void {
     group.expanded = !group.expanded;
+  }
+
+  onNavItemClick(): void {
+    if (this.breakpoint.isMobile() || this.breakpoint.isTablet()) {
+      this.navigationSelected.emit();
+    }
   }
 }

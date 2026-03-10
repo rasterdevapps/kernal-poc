@@ -1,5 +1,10 @@
 <header class="app-header">
   <div class="header-left">
+    @if (breakpoint.isMobile() || breakpoint.isTablet()) {
+      <button class="menu-toggle" (click)="onMenuToggle()" aria-label="Toggle navigation menu">
+        <span class="hamburger-icon">☰</span>
+      </button>
+    }
     <a routerLink="/dashboard" class="logo-link">
       <span class="logo-icon">◈</span>
       <span class="logo-text">ERP Kernel</span>
@@ -28,12 +33,16 @@
     <button class="header-icon-btn" aria-label="Notifications">
       <span class="icon">🔔</span>
     </button>
-    <button class="header-icon-btn" aria-label="Help">
-      <span class="icon">❓</span>
-    </button>
+    @if (!breakpoint.isMobile()) {
+      <button class="header-icon-btn" aria-label="Help">
+        <span class="icon">❓</span>
+      </button>
+    }
     <div class="user-menu">
       <span class="user-avatar">U</span>
-      <span class="user-name">User</span>
+      @if (!breakpoint.isMobile()) {
+        <span class="user-name">User</span>
+      }
     </div>
   </div>
 </header>
