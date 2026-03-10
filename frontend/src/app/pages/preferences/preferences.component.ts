@@ -17,6 +17,9 @@ export class PreferencesComponent implements OnInit {
   private readonly themeService = inject(ThemeService);
   private readonly fb = inject(FormBuilder);
 
+  // TODO: Replace with dynamic user ID from authentication service
+  private readonly currentUserId = 1;
+
   readonly themes = signal<Theme[]>([]);
   readonly preference = signal<UserPreference | null>(null);
   readonly loading = signal(true);
@@ -42,10 +45,10 @@ export class PreferencesComponent implements OnInit {
   private loadData(): void {
     this.themeService.findAll().subscribe({
       next: (themes) => this.themes.set(themes),
-      error: (err) => console.error('Failed to load themes', err)
+      error: (err) => console.error('Failed to load themes from API:', err.message, err)
     });
 
-    this.preferenceService.findByUserId(1).subscribe({
+    this.preferenceService.findByUserId(this.currentUserId).subscribe({
       next: (pref) => {
         this.preference.set(pref);
         this.form.patchValue({
@@ -58,7 +61,7 @@ export class PreferencesComponent implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
-        console.error('Failed to load user preferences', err);
+        console.error('Failed to load user preferences from API:', err.message, err);
         this.loading.set(false);
       }
     });
@@ -73,7 +76,7 @@ export class PreferencesComponent implements OnInit {
     this.saved.set(false);
 
     const request: CreateUserPreferenceRequest = {
-      userId: 1,
+      userId: this.currentUserId,
       ...this.form.value
     };
 
@@ -85,7 +88,7 @@ export class PreferencesComponent implements OnInit {
           this.saved.set(true);
         },
         error: (err) => {
-          console.error('Failed to save preferences', err);
+          console.error('Failed to save user preferences to API:', err.message, err);
           this.saving.set(false);
         }
       });
@@ -97,7 +100,7 @@ export class PreferencesComponent implements OnInit {
           this.saved.set(true);
         },
         error: (err) => {
-          console.error('Failed to create preferences', err);
+          console.error('Failed to create user preferences via API:', err.message, err);
           this.saving.set(false);
         }
       });

@@ -39,7 +39,7 @@ export class ThemeListComponent implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
-        console.error('Failed to load themes', err);
+        console.error('Failed to load themes from API:', err.message, err);
         this.loading.set(false);
       }
     });

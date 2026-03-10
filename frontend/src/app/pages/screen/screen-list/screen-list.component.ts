@@ -43,7 +43,7 @@ export class ScreenListComponent implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
-        console.error('Failed to load screens', err);
+        console.error('Failed to load screens from API:', err.message, err);
         this.loading.set(false);
       }
     });

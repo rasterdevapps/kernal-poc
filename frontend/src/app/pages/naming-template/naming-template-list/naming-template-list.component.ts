@@ -38,7 +38,7 @@ export class NamingTemplateListComponent implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
-        console.error('Failed to load naming templates', err);
+        console.error('Failed to load naming templates from API:', err.message, err);
         this.loading.set(false);
       }
     });

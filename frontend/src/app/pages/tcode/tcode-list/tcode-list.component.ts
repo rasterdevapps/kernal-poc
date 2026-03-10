@@ -42,7 +42,7 @@ export class TCodeListComponent implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
-        console.error('Failed to load T-Codes', err);
+        console.error('Failed to load T-Codes from API:', err.message, err);
         this.loading.set(false);
       }
     });
