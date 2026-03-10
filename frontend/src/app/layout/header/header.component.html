@@ -1,0 +1,39 @@
+<header class="app-header">
+  <div class="header-left">
+    <a routerLink="/dashboard" class="logo-link">
+      <span class="logo-icon">◈</span>
+      <span class="logo-text">ERP Kernel</span>
+    </a>
+  </div>
+
+  <div class="header-center">
+    <div class="tcode-input-wrapper">
+      <span class="tcode-prefix">▶</span>
+      <input
+        type="text"
+        class="tcode-input"
+        placeholder="Enter T-Code (e.g. SU01)"
+        [value]="tcodeInput()"
+        (input)="onInput($event)"
+        (keydown)="onKeyDown($event)"
+        aria-label="T-Code command input"
+      />
+      <button class="tcode-submit" (click)="onTCodeSubmit()" aria-label="Execute T-Code">
+        ↵
+      </button>
+    </div>
+  </div>
+
+  <div class="header-right">
+    <button class="header-icon-btn" aria-label="Notifications">
+      <span class="icon">🔔</span>
+    </button>
+    <button class="header-icon-btn" aria-label="Help">
+      <span class="icon">❓</span>
+    </button>
+    <div class="user-menu">
+      <span class="user-avatar">U</span>
+      <span class="user-name">User</span>
+    </div>
+  </div>
+</header>

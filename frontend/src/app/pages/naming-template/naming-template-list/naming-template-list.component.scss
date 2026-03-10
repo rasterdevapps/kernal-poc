@@ -1,0 +1,78 @@
+.page {
+  max-width: 1200px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+
+  h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1a2b3c;
+    margin: 0 0 4px;
+  }
+
+  .subtitle {
+    color: #6c757d;
+    font-size: 14px;
+    margin: 0;
+  }
+}
+
+.form-card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
+
+  h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #354a5f;
+    margin: 0 0 16px;
+  }
+}
+
+.name-cell {
+  font-weight: 600;
+  color: #1a2b3c;
+  text-transform: uppercase;
+}
+
+.pattern-cell {
+  font-family: 'Consolas', 'Courier New', monospace;
+  color: #1a6fb5;
+  font-size: 13px;
+}
+
+.example-cell {
+  font-family: 'Consolas', 'Courier New', monospace;
+  color: #6c757d;
+  font-size: 13px;
+}
+
+.actions-cell {
+  white-space: nowrap;
+}
+
+.btn-icon {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #f0f0f0;
+  }
+
+  &.danger:hover {
+    background: #fce8e6;
+  }
+}

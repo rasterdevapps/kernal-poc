@@ -1,0 +1,150 @@
+.page {
+  max-width: 1200px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+
+  h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1a2b3c;
+    margin: 0 0 4px;
+  }
+
+  .subtitle {
+    color: #6c757d;
+    font-size: 14px;
+    margin: 0;
+  }
+}
+
+.form-card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
+
+  h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #354a5f;
+    margin: 0 0 16px;
+  }
+}
+
+.color-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  input[type="color"] {
+    width: 40px;
+    height: 32px;
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    padding: 2px;
+    cursor: pointer;
+  }
+}
+
+.color-value {
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: flex-end;
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #444;
+  }
+}
+
+.name-cell {
+  font-weight: 600;
+  color: #1a2b3c;
+}
+
+.color-preview {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.color-swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+  display: inline-block;
+}
+
+.color-hex {
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+
+  &.default {
+    background: #e8f0fe;
+    color: #1a6fb5;
+  }
+}
+
+.status {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 10px;
+
+  &.active {
+    background: #e6f4ea;
+    color: #1e7e34;
+  }
+
+  &.inactive {
+    background: #fce8e6;
+    color: #c62828;
+  }
+}
+
+.actions-cell {
+  white-space: nowrap;
+}
+
+.btn-icon {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #f0f0f0;
+  }
+
+  &.danger:hover {
+    background: #fce8e6;
+  }
+}

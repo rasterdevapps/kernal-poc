@@ -1,0 +1,75 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Naming Templates</h1>
+      <p class="subtitle">Manage naming conventions and patterns for entities</p>
+    </div>
+    <button class="btn btn-primary" (click)="openCreateForm()">+ Create Template</button>
+  </div>
+
+  @if (showForm()) {
+    <div class="form-card">
+      <h2>{{ editingId() !== null ? 'Edit' : 'Create' }} Naming Template</h2>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="entityType">Entity Type</label>
+            <input id="entityType" formControlName="entityType" placeholder="e.g. USER, ORDER" />
+          </div>
+          <div class="form-group">
+            <label for="pattern">Pattern</label>
+            <input id="pattern" formControlName="pattern" placeholder="e.g. {PREFIX}-{SEQUENCE}" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="description">Description</label>
+            <input id="description" formControlName="description" placeholder="Optional description" />
+          </div>
+          <div class="form-group">
+            <label for="example">Example</label>
+            <input id="example" formControlName="example" placeholder="e.g. USR-00001" />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Save</button>
+          <button type="button" class="btn btn-secondary" (click)="cancelForm()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="loading">Loading templates...</div>
+  } @else if (templates().length === 0) {
+    <div class="empty-state">No naming templates found.</div>
+  } @else {
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Entity Type</th>
+            <th>Pattern</th>
+            <th>Description</th>
+            <th>Example</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (template of templates(); track template.id) {
+            <tr>
+              <td class="name-cell">{{ template.entityType }}</td>
+              <td class="pattern-cell">{{ template.pattern }}</td>
+              <td>{{ template.description }}</td>
+              <td class="example-cell">{{ template.example }}</td>
+              <td class="actions-cell">
+                <button class="btn-icon" (click)="openEditForm(template)" title="Edit">✏️</button>
+                <button class="btn-icon danger" (click)="deleteTemplate(template.id)" title="Delete">🗑️</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

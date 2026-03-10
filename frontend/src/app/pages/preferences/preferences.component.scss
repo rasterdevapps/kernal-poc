@@ -1,0 +1,74 @@
+.page {
+  max-width: 720px;
+}
+
+.page-header {
+  margin-bottom: 24px;
+
+  h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1a2b3c;
+    margin: 0 0 4px;
+  }
+
+  .subtitle {
+    color: #6c757d;
+    font-size: 14px;
+    margin: 0;
+  }
+}
+
+.preferences-card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 32px;
+}
+
+.form-section {
+  margin-bottom: 28px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #f0f0f0;
+
+  &:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  h2 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #354a5f;
+    margin: 0 0 16px;
+  }
+}
+
+select {
+  padding: 8px 12px;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  font-size: 13px;
+  background: #fff;
+  color: #333;
+  width: 100%;
+  transition: border-color 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: #1a6fb5;
+  }
+}
+
+.hint {
+  font-size: 11px;
+  color: #8c9bab;
+  margin-top: 4px;
+}
+
+.save-success {
+  color: #1e7e34;
+  font-size: 13px;
+  font-weight: 500;
+}

@@ -1,0 +1,95 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>T-Code Management</h1>
+      <p class="subtitle">Manage transaction codes for ERP navigation</p>
+    </div>
+    <button class="btn btn-primary" (click)="openCreateForm()">+ Create T-Code</button>
+  </div>
+
+  @if (showForm()) {
+    <div class="form-card">
+      <h2>{{ editingId() !== null ? 'Edit' : 'Create' }} T-Code</h2>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="code">Code</label>
+            <input id="code" formControlName="code" placeholder="e.g. SU01" />
+          </div>
+          <div class="form-group">
+            <label for="module">Module</label>
+            <input id="module" formControlName="module" placeholder="e.g. USER" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="description">Description</label>
+          <input id="description" formControlName="description" placeholder="User Management" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="route">Route</label>
+            <input id="route" formControlName="route" placeholder="/admin/users" />
+          </div>
+          <div class="form-group">
+            <label for="icon">Icon</label>
+            <input id="icon" formControlName="icon" placeholder="Optional icon" />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Save</button>
+          <button type="button" class="btn btn-secondary" (click)="cancelForm()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <div class="filter-bar">
+    <input
+      type="text"
+      class="filter-input"
+      placeholder="Filter by module..."
+      [value]="moduleFilter()"
+      (input)="onModuleFilterChange($event)"
+    />
+  </div>
+
+  @if (loading()) {
+    <div class="loading">Loading T-Codes...</div>
+  } @else if (filteredTCodes().length === 0) {
+    <div class="empty-state">No T-Codes found.</div>
+  } @else {
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Description</th>
+            <th>Module</th>
+            <th>Route</th>
+            <th>Active</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (tcode of filteredTCodes(); track tcode.id) {
+            <tr>
+              <td class="code-cell">{{ tcode.code }}</td>
+              <td>{{ tcode.description }}</td>
+              <td><span class="badge">{{ tcode.module }}</span></td>
+              <td class="route-cell">{{ tcode.route }}</td>
+              <td>
+                <span class="status" [class.active]="tcode.active" [class.inactive]="!tcode.active">
+                  {{ tcode.active ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+              <td class="actions-cell">
+                <button class="btn-icon" (click)="openEditForm(tcode)" title="Edit">✏️</button>
+                <button class="btn-icon danger" (click)="deleteTCode(tcode.id)" title="Delete">🗑️</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
