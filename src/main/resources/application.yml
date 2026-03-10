@@ -26,3 +26,35 @@ management:
   endpoint:
     health:
       show-details: when-authorized
+
+erp:
+  api:
+    jwt:
+      expiration-minutes: 60
+      issuer: erp-kernel
+    rate-limit:
+      enabled: true
+      requests-per-second: 100
+      burst-capacity: 200
+    cors:
+      allowed-origins:
+        - "*"
+      allowed-methods:
+        - GET
+        - POST
+        - PUT
+        - PATCH
+        - DELETE
+        - OPTIONS
+      allowed-headers:
+        - "*"
+      allow-credentials: false
+      max-age: 3600
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha

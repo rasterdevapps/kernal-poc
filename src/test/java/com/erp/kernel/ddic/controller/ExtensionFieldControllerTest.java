@@ -4,9 +4,11 @@ import com.erp.kernel.ddic.dto.CreateExtensionFieldValueRequest;
 import com.erp.kernel.ddic.dto.ExtensionFieldValueDto;
 import com.erp.kernel.ddic.exception.ValidationException;
 import com.erp.kernel.ddic.service.ExtensionFieldService;
+import com.erp.kernel.api.jwt.JwtTokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
@@ -23,11 +25,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.erp.kernel.api.config.CorsProperties;
 
 /**
  * Tests for the {@link ExtensionFieldController}.
  */
 @WebMvcTest(ExtensionFieldController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class ExtensionFieldControllerTest {
 
     @Autowired
@@ -38,6 +42,12 @@ class ExtensionFieldControllerTest {
 
     @MockitoBean
     private ExtensionFieldService extensionFieldService;
+
+    @MockitoBean
+    private CorsProperties corsProperties;
+
+    @MockitoBean
+    private JwtTokenService jwtTokenService;
 
     @Test
     void shouldSaveExtensionFieldValue_whenValidRequest() throws Exception {

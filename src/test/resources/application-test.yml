@@ -20,6 +20,29 @@ spring:
 erp:
   encryption:
     secret-key: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
+  api:
+    jwt:
+      secret-key: ZXJwLWtlcm5lbC1kZXYta2V5LW11c3QtYmUtMzItYnl0ZXM=
+      expiration-minutes: 60
+      issuer: erp-kernel-test
+    rate-limit:
+      enabled: false
+      requests-per-second: 100
+      burst-capacity: 200
+    cors:
+      allowed-origins:
+        - "*"
+      allowed-methods:
+        - GET
+        - POST
+        - PUT
+        - PATCH
+        - DELETE
+        - OPTIONS
+      allowed-headers:
+        - "*"
+      allow-credentials: false
+      max-age: 3600
   security:
     ldap:
       enabled: false

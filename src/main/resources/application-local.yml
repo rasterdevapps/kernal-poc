@@ -19,6 +19,24 @@ spring:
 erp:
   encryption:
     secret-key: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
+  api:
+    jwt:
+      secret-key: ZXJwLWtlcm5lbC1kZXYta2V5LW11c3QtYmUtMzItYnl0ZXM=
+    cors:
+      allowed-origins:
+        - "http://localhost:4200"
+        - "http://localhost:3000"
+      allowed-methods:
+        - GET
+        - POST
+        - PUT
+        - PATCH
+        - DELETE
+        - OPTIONS
+      allowed-headers:
+        - "*"
+      allow-credentials: true
+      max-age: 3600
   security:
     ldap:
       enabled: false

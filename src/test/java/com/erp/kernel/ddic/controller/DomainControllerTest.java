@@ -5,9 +5,11 @@ import com.erp.kernel.ddic.dto.DomainDto;
 import com.erp.kernel.ddic.exception.DuplicateEntityException;
 import com.erp.kernel.ddic.exception.EntityNotFoundException;
 import com.erp.kernel.ddic.service.DomainService;
+import com.erp.kernel.api.jwt.JwtTokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
@@ -27,11 +29,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.erp.kernel.api.config.CorsProperties;
 
 /**
  * Tests for the {@link DomainController}.
  */
 @WebMvcTest(DomainController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class DomainControllerTest {
 
     @Autowired
@@ -42,6 +46,12 @@ class DomainControllerTest {
 
     @MockitoBean
     private DomainService domainService;
+
+    @MockitoBean
+    private CorsProperties corsProperties;
+
+    @MockitoBean
+    private JwtTokenService jwtTokenService;
 
     @Test
     void shouldCreateDomain_whenValidRequest() throws Exception {

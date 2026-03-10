@@ -1,5 +1,6 @@
 package com.erp.kernel.ddic.exception;
 
+import com.erp.kernel.api.ratelimit.RateLimitExceededException;
 import com.erp.kernel.security.exception.AccountLockedException;
 import com.erp.kernel.security.exception.AuthenticationException;
 import com.erp.kernel.security.exception.AuthorizationException;
@@ -113,6 +114,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAccountLocked(final AccountLockedException ex) {
         LOG.warn("Account locked: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.LOCKED)
+                .body(new ErrorResponse(ex.getMessage()));
+    }
+
+    /**
+     * Handles rate limit exceeded exceptions.
+     *
+     * @param ex the exception
+     * @return a 429 response with the error message
+     */
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ResponseEntity<ErrorResponse> handleRateLimitExceeded(
+            final RateLimitExceededException ex) {
+        LOG.warn("Rate limit exceeded: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                 .body(new ErrorResponse(ex.getMessage()));
     }
 }

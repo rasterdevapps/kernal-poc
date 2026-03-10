@@ -3,9 +3,11 @@ package com.erp.kernel.ddic.controller;
 import com.erp.kernel.ddic.dto.CreateSearchHelpRequest;
 import com.erp.kernel.ddic.dto.SearchHelpDto;
 import com.erp.kernel.ddic.service.SearchHelpService;
+import com.erp.kernel.api.jwt.JwtTokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
@@ -24,11 +26,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.erp.kernel.api.config.CorsProperties;
 
 /**
  * Tests for the {@link SearchHelpController}.
  */
 @WebMvcTest(SearchHelpController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class SearchHelpControllerTest {
 
     @Autowired
@@ -39,6 +43,12 @@ class SearchHelpControllerTest {
 
     @MockitoBean
     private SearchHelpService searchHelpService;
+
+    @MockitoBean
+    private CorsProperties corsProperties;
+
+    @MockitoBean
+    private JwtTokenService jwtTokenService;
 
     @Test
     void shouldCreateSearchHelp_whenValidRequest() throws Exception {

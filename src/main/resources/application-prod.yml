@@ -16,6 +16,24 @@ spring:
 erp:
   encryption:
     secret-key: ${ENCRYPTION_SECRET_KEY:}
+  api:
+    jwt:
+      secret-key: ${JWT_SECRET_KEY:}
+    cors:
+      allowed-origins: ${CORS_ALLOWED_ORIGINS:}
+      allowed-methods:
+        - GET
+        - POST
+        - PUT
+        - PATCH
+        - DELETE
+        - OPTIONS
+      allowed-headers:
+        - Authorization
+        - Content-Type
+        - Accept
+      allow-credentials: true
+      max-age: 3600
   security:
     ldap:
       enabled: ${LDAP_ENABLED:false}
