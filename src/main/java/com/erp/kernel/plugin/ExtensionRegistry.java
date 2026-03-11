@@ -64,8 +64,8 @@ public class ExtensionRegistry {
      */
     public boolean hasExtensions(final ExtensionPoint<?> extensionPoint) {
         Objects.requireNonNull(extensionPoint, "extensionPoint must not be null");
-        final var list = extensions.get(extensionPoint.getName());
-        return list != null && !list.isEmpty();
+        final var list = extensions.getOrDefault(extensionPoint.getName(), List.of());
+        return !list.isEmpty();
     }
 
     /**
