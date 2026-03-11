@@ -22,10 +22,15 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,metrics,prometheus
   endpoint:
     health:
       show-details: when-authorized
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
 
 erp:
   api:
@@ -50,6 +55,23 @@ erp:
         - "*"
       allow-credentials: false
       max-age: 3600
+
+  resilience:
+    circuit-breaker:
+      failure-threshold: 5
+      half-open-max-calls: 3
+      open-state-duration-seconds: 60
+    backup:
+      enabled: true
+      retention-days: 30
+      storage-path: /var/erp/backups
+    disaster-recovery:
+      rpo-minutes: 60
+      rto-minutes: 240
+      replication-target: ""
+    monitoring:
+      metrics-enabled: true
+      tracing-enabled: false
 
 springdoc:
   api-docs:

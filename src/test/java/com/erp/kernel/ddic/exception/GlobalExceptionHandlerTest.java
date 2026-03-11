@@ -1,6 +1,7 @@
 package com.erp.kernel.ddic.exception;
 
 import com.erp.kernel.api.ratelimit.RateLimitExceededException;
+import com.erp.kernel.resilience.circuitbreaker.CircuitBreakerOpenException;
 import com.erp.kernel.security.exception.AccountLockedException;
 import com.erp.kernel.security.exception.AuthenticationException;
 import com.erp.kernel.security.exception.AuthorizationException;
@@ -107,5 +108,27 @@ class GlobalExceptionHandlerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.TOO_MANY_REQUESTS);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().message()).isEqualTo("Rate limit exceeded");
+    }
+
+    @Test
+    void shouldReturnConflict_whenIllegalStateExceptionThrown() {
+        final var ex = new IllegalStateException("Only COMPLETED backups can be verified");
+
+        final var response = handler.handleIllegalState(ex);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().message()).isEqualTo("Only COMPLETED backups can be verified");
+    }
+
+    @Test
+    void shouldReturnServiceUnavailable_whenCircuitBreakerOpenExceptionThrown() {
+        final var ex = new CircuitBreakerOpenException("Circuit breaker 'db' is OPEN");
+
+        final var response = handler.handleCircuitBreakerOpen(ex);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().message()).isEqualTo("Circuit breaker 'db' is OPEN");
     }
 }

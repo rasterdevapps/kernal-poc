@@ -97,11 +97,11 @@
 
 | # | Milestone | Description | Status |
 |---|-----------|-------------|--------|
-| 8.1 | **High Availability & Redundancy** | Design the deployment topology for high availability — active-passive or active-active clustering, load balancing, and failover for application and database tiers. | ⬜ Not Started |
-| 8.2 | **Automated Backup Strategy** | Implement automated full, differential, and transaction-log backups with configurable retention policies and off-site replication. | ⬜ Not Started |
-| 8.3 | **Disaster Recovery Plan** | Define RPO/RTO targets, set up cross-region/cross-site replication, and document recovery runbooks. | ⬜ Not Started |
-| 8.4 | **Continuity of Service** | Implement health checks, circuit breakers, graceful degradation, and automated recovery mechanisms to ensure uninterrupted service. | ⬜ Not Started |
-| 8.5 | **Monitoring, Alerting & Observability** | Integrate centralised logging, metrics collection, distributed tracing, and alerting (e.g., Prometheus, Grafana, ELK) to proactively detect and respond to issues. | ⬜ Not Started |
+| 8.1 | **High Availability & Redundancy** | Design the deployment topology for high availability — active-passive or active-active clustering, load balancing, and failover for application and database tiers. | ✅ Completed |
+| 8.2 | **Automated Backup Strategy** | Implement automated full, differential, and transaction-log backups with configurable retention policies and off-site replication. | ✅ Completed |
+| 8.3 | **Disaster Recovery Plan** | Define RPO/RTO targets, set up cross-region/cross-site replication, and document recovery runbooks. | ✅ Completed |
+| 8.4 | **Continuity of Service** | Implement health checks, circuit breakers, graceful degradation, and automated recovery mechanisms to ensure uninterrupted service. | ✅ Completed |
+| 8.5 | **Monitoring, Alerting & Observability** | Integrate centralised logging, metrics collection, distributed tracing, and alerting (e.g., Prometheus, Grafana, ELK) to proactively detect and respond to issues. | ✅ Completed |
 
 ---
 
