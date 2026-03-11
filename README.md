@@ -103,8 +103,6 @@ See [`.github/copilot-instructions.md`](.github/copilot-instructions.md) for the
 
 ## Getting Started — Onboarding Guide
 
-> **New to this project?** See the full [Getting Started Guide for Freshers](docs/GETTING_STARTED.md) for a step-by-step walkthrough covering setup, running the application, understanding the code, writing tests, and a glossary of key terms.
-
 New developers should follow these steps to get productive with the ERP Kernel:
 
 ### 1. Prerequisites
