@@ -73,6 +73,12 @@ erp:
       metrics-enabled: true
       tracing-enabled: false
 
+  benchmark:
+    enabled: false
+    warmup-iterations: 3
+    measure-iterations: 10
+    concurrent-users: 50
+
 springdoc:
   api-docs:
     path: /v3/api-docs

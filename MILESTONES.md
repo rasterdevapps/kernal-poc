@@ -113,7 +113,7 @@
 | 9.2 | **Plugin & Extension Architecture** | Design a plugin system allowing vertical-specific modules (One Health, manufacturing, retail, etc.) to be developed and deployed independently. | 🔄 In Progress |
 | 9.3 | **Framework Documentation** | Produce comprehensive developer documentation, architecture decision records (ADRs), and onboarding guides. | ⬜ Not Started |
 | 9.4 | **Multi-Vertical Readiness** | Validate the framework against at least two industry verticals (e.g., One Health + another) to confirm reusability and extensibility. | 🔄 In Progress |
-| 9.5 | **Performance & Scalability Benchmarking** | Conduct load testing and performance benchmarking; establish baseline metrics and tuning guidelines for production deployments. | ⬜ Not Started |
+| 9.5 | **Performance & Scalability Benchmarking** | Conduct load testing and performance benchmarking; establish baseline metrics and tuning guidelines for production deployments. | 🔄 In Progress |
 
 ---
 
