@@ -51,6 +51,8 @@ section {
   color: #333;
   transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s;
   text-align: center;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 
   &:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -130,4 +132,61 @@ section {
   color: #8c9bab;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+/* Tablet responsive */
+@media (max-width: 1023px) {
+  .tile-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+  }
+
+  .tcode-cards {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 767px) {
+  .dashboard-header {
+    margin-bottom: 20px;
+
+    h1 {
+      font-size: 20px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+    }
+  }
+
+  section {
+    margin-bottom: 20px;
+  }
+
+  .tile-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .tile {
+    padding: 16px 12px;
+  }
+
+  .tile-icon {
+    font-size: 24px;
+  }
+
+  .tile-label {
+    font-size: 13px;
+  }
+
+  .tile-desc {
+    font-size: 11px;
+  }
+
+  .tcode-cards {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
 }

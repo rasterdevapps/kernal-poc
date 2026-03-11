@@ -16,6 +16,28 @@
   display: flex;
   align-items: center;
   min-width: 200px;
+  gap: 8px;
+}
+
+.menu-toggle {
+  border: none;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 18px;
+  transition: background 0.2s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.hamburger-icon {
+  line-height: 1;
 }
 
 .logo-link {
@@ -152,4 +174,54 @@
 .user-name {
   font-size: 13px;
   color: rgba(255, 255, 255, 0.9);
+}
+
+/* Tablet responsive */
+@media (max-width: 1023px) {
+  .header-left {
+    min-width: auto;
+  }
+
+  .header-center {
+    max-width: 320px;
+    margin: 0 12px;
+  }
+
+  .header-right {
+    min-width: auto;
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 767px) {
+  .app-header {
+    padding: 0 8px;
+  }
+
+  .header-left {
+    min-width: auto;
+  }
+
+  .logo-text {
+    display: none;
+  }
+
+  .header-center {
+    flex: 1;
+    max-width: none;
+    margin: 0 8px;
+  }
+
+  .tcode-input {
+    font-size: 12px;
+  }
+
+  .tcode-input::placeholder {
+    font-size: 11px;
+  }
+
+  .header-right {
+    min-width: auto;
+    gap: 2px;
+  }
 }

@@ -72,3 +72,23 @@ select {
   font-size: 13px;
   font-weight: 500;
 }
+
+/* Mobile responsive */
+@media (max-width: 767px) {
+  .page-header {
+    margin-bottom: 16px;
+
+    h1 {
+      font-size: 20px;
+    }
+  }
+
+  .preferences-card {
+    padding: 16px;
+  }
+
+  .form-section {
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+  }
+}

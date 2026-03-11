@@ -1,0 +1,11 @@
+@if (breakpoint.isMobile() || breakpoint.isTablet()) {
+  <nav class="bottom-nav" aria-label="Mobile navigation">
+    @for (item of navItems; track item.route) {
+      <a [routerLink]="item.route" routerLinkActive="active" class="bottom-nav-item"
+         [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }">
+        <span class="bottom-nav-icon">{{ item.icon }}</span>
+        <span class="bottom-nav-label">{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+}

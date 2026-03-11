@@ -1,6 +1,7 @@
-import { Component, output, signal } from '@angular/core';
+import { Component, inject, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { BreakpointService } from '../../services/breakpoint.service';
 
 @Component({
   selector: 'app-header',
@@ -10,7 +11,9 @@ import { RouterLink } from '@angular/router';
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
+  readonly breakpoint = inject(BreakpointService);
   readonly tcodeSubmitted = output<string>();
+  readonly menuToggled = output<void>();
   readonly tcodeInput = signal('');
 
   onInput(event: Event): void {
@@ -30,5 +33,9 @@ export class HeaderComponent {
     if (event.key === 'Enter') {
       this.onTCodeSubmit();
     }
+  }
+
+  onMenuToggle(): void {
+    this.menuToggled.emit();
   }
 }

@@ -1,10 +1,18 @@
-<div class="layout">
-  <app-header (tcodeSubmitted)="onTCodeSubmitted($event)" />
+<div class="layout" [class.mobile]="breakpoint.isMobile()" [class.tablet]="breakpoint.isTablet()">
+  <app-header (tcodeSubmitted)="onTCodeSubmitted($event)" (menuToggled)="toggleMobileSidebar()" />
   <div class="layout-body">
-    <app-sidebar />
+    @if (breakpoint.isMobile() || breakpoint.isTablet()) {
+      @if (mobileSidebarOpen()) {
+        <div class="sidebar-overlay" (click)="closeMobileSidebar()"></div>
+      }
+      <app-sidebar [class.open]="mobileSidebarOpen()" (navigationSelected)="closeMobileSidebar()" />
+    } @else {
+      <app-sidebar />
+    }
     <main class="layout-content">
       <router-outlet />
     </main>
   </div>
   <app-footer />
+  <app-bottom-nav />
 </div>
