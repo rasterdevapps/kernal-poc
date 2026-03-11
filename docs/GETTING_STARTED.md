@@ -19,6 +19,19 @@
     - [9.1 Three-layer architecture](#91-three-layer-architecture-controller--service--repository)
     - [9.2 T-codes](#92-t-codes-transaction-codes)
     - [9.3 Data Dictionary and Z-fields](#93-data-dictionary-ddic-and-z-field-extensions)
+      - [9.3.1 What is a Data Dictionary?](#931-what-is-a-data-dictionary)
+      - [9.3.2 The building blocks](#932-the-building-blocks--how-they-fit-together)
+      - [9.3.3 Three-schema architecture](#933-the-three-schema-architecture)
+      - [9.3.4 Project file structure](#934-where-it-lives-in-the-project)
+      - [9.3.5 Database schema (Flyway)](#935-the-database-schema-flyway-migration)
+      - [9.3.6 Entity classes](#936-the-real-entity-classes)
+      - [9.3.7 DTOs](#937-the-request-and-response-dtos)
+      - [9.3.8 Service layer](#938-the-service-layer--business-logic-and-validation)
+      - [9.3.9 REST API endpoints](#939-the-rest-api-endpoints)
+      - [9.3.10 Walkthrough: build a CUSTOMERS table](#9310-complete-walkthrough--building-a-customers-table-from-scratch)
+      - [9.3.11 Z-fields explained](#9311-what-are-z-fields-and-why-do-they-exist)
+      - [9.3.12 Adding a new DDIC feature](#9312-how-to-add-a-new-ddic-feature-as-a-developer)
+      - [9.3.13 Quick reference](#9313-ddic-quick-reference)
     - [9.4 Spring Profiles](#94-spring-profiles--environment-switching)
     - [9.5 Flyway migrations](#95-flyway--database-migrations)
     - [9.6 JWT authentication](#96-jwt--api-authentication)
@@ -796,122 +809,1042 @@ export class TCodeService {
 
 ### 9.3 Data Dictionary (DDIC) and Z-field extensions
 
-The **Data Dictionary** is a metadata store that describes the database schema through the application instead of raw SQL. It is inspired by SAP's SE11 transaction and implements the **ANSI/SPARC three-schema architecture** (External, Conceptual, Internal).
+> This is the most important concept unique to this project. Read this section carefully if you are new — it explains **what DDIC is**, **why it exists**, **how every piece connects**, and walks you through a **complete end-to-end example** using the real APIs.
 
-#### Where it lives in the project
+---
+
+#### 9.3.1 What is a Data Dictionary?
+
+Imagine you are building an ERP system that manages customers, orders, invoices, materials, and employees. Each of these has database tables with columns. Normally, you would write SQL like:
+
+```sql
+CREATE TABLE customers (
+    customer_name VARCHAR(100),
+    country_code  VARCHAR(3),
+    ...
+);
+```
+
+The problem with this approach in a large ERP system:
+
+1. **No reuse** — If `customer_name` and `supplier_name` both need the same rules (max 100 characters, type CHAR), you define those rules separately in each table. Change one and you must find and change all the others.
+2. **No labels** — The database column `country_code` does not know that it should display as "Country", "Ctry", or "Country Code" on different screen sizes.
+3. **No extensions** — A hospital client needs a `BLOOD_TYPE` column on the patient table, but the core ERP code should not be modified for one client.
+
+The **Data Dictionary (DDIC)** solves all three problems by managing the database schema **as data within the application itself**. Instead of hardcoding table structures in SQL, you define reusable building blocks — **Domains**, **Data Elements**, **Table Definitions**, **Table Fields**, **Search Helps**, and **Extension Fields** — through REST APIs.
+
+> **In simple terms:** The DDIC is a "database that describes your database". It is inspired by SAP's SE11 transaction and implements the ANSI/SPARC three-schema architecture.
+
+---
+
+#### 9.3.2 The building blocks — how they fit together
+
+The DDIC has six building blocks, and they connect in a specific order. Think of them as Lego bricks — you build from the bottom up:
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                     TABLE DEFINITION                             │
+│    (e.g., "CUSTOMERS" — a table at a specific schema level)      │
+│                                                                  │
+│    ┌──────────────────────────────────────────────────────────┐   │
+│    │  TABLE FIELD            TABLE FIELD            TABLE FIELD│  │
+│    │  (e.g., "CUST_NAME")   (e.g., "COUNTRY")     (Z_LOYALTY) │  │
+│    │       │                      │                     │      │  │
+│    │       ▼                      ▼                     ▼      │  │
+│    │  DATA ELEMENT          DATA ELEMENT           DATA ELEMENT│  │
+│    │  (labels, desc)        (labels, desc)         (labels)    │  │
+│    │       │                      │                     │      │  │
+│    │       ▼                      ▼                     ▼      │  │
+│    │    DOMAIN                 DOMAIN                DOMAIN     │  │
+│    │  (CHAR, 100)           (CHAR, 3)             (CHAR, 20)   │  │
+│    └──────────────────────────────────────────────────────────┘   │
+└──────────────────────────────────────────────────────────────────┘
+
+SEARCH HELP  →  links to a TABLE DEFINITION for dropdown lookups
+
+EXTENSION FIELD VALUE  →  stores custom "Z_" field values (EAV pattern)
+```
+
+Here is what each building block does:
+
+| Building block | What it defines | Real-world analogy | Example |
+|---|---|---|---|
+| **Domain** | Technical rules: data type, max length, decimal places | A specification sheet — "this must be a string of at most 100 characters" | `CHAR_100` = type CHAR, length 100 |
+| **Data Element** | Business meaning: labels for different screen sizes, description. References one Domain. | A label maker — "this field should display as 'Customer Name' on desktop and 'Name' on mobile" | `CUST_NAME_EL` with labels "Name" / "Cust Name" / "Customer Name" |
+| **Table Definition** | A logical table at a specific schema level (External, Conceptual, or Internal) | A table blueprint — "this is the CUSTOMERS table and it exists at the CONCEPTUAL level" | `CUSTOMERS` at schema level `CONCEPTUAL` |
+| **Table Field** | A column within a table. References one Data Element and one Table Definition. | A column in a spreadsheet — "column 1 is CUST_NAME, column 2 is COUNTRY" | `CUST_NAME` at position 1, key=false, nullable=false |
+| **Search Help** | A lookup mechanism linked to a Table Definition for dropdown suggestions | A dropdown list — "when the user clicks the Country field, show a list of valid countries from the COUNTRIES table" | `SH_COUNTRY` linked to `COUNTRIES` table |
+| **Extension Field Value** | A custom value for a "Z_" field on any record in any table (EAV pattern) | A sticky note on a record — "for customer #42, add a 'Z_LOYALTY_TIER' field with value 'GOLD'" | `Z_LOYALTY_TIER` = "GOLD" on CUSTOMERS record 42 |
+
+---
+
+#### 9.3.3 The three-schema architecture
+
+Every Table Definition has a **schema level** — this comes from the ANSI/SPARC standard, which separates a database into three views:
+
+```java
+// File: src/main/java/com/erp/kernel/ddic/model/SchemaLevel.java
+
+public enum SchemaLevel {
+    /** The user or application view of data. */
+    EXTERNAL,
+
+    /** The logical structure of the entire database. */
+    CONCEPTUAL,
+
+    /** The physical storage representation. */
+    INTERNAL
+}
+```
+
+| Level | What it means | Example |
+|---|---|---|
+| **EXTERNAL** | How a specific user or application sees the data. Like a database view — shows only relevant columns. | A "Customer Summary" view showing just name and country |
+| **CONCEPTUAL** | The complete logical model of the business entity. This is the "truth" — all fields an entity actually has. | The full `CUSTOMERS` table with all 20 columns |
+| **INTERNAL** | How data is physically stored (indexes, partitions, storage details). | Physical storage optimisations for the CUSTOMERS table |
+
+> **For freshers:** You will almost always work with `CONCEPTUAL` level tables. The other levels are used for advanced data modelling.
+
+---
+
+#### 9.3.4 Where it lives in the project
 
 ```
 src/main/java/com/erp/kernel/ddic/
-├── entity/
-│   ├── TableDefinition.java        # Table metadata
-│   ├── TableField.java             # Field metadata within a table
-│   ├── Domain.java                 # Value domains (e.g., valid ranges)
-│   ├── DataElement.java            # Semantic meaning of a field
-│   ├── SearchHelp.java             # Lookup/dropdown definitions
-│   └── ExtensionFieldValue.java    # Z-field custom extensions (EAV pattern)
-├── dto/                            # Request/response records
-├── service/                        # Business logic
-├── controller/                     # REST endpoints
-├── mapper/                         # Entity ↔ DTO conversion
-├── repository/                     # Database access
-└── exception/                      # Shared exception classes
+├── entity/                              # JPA entities — the database tables
+│   ├── BaseEntity.java                  # Shared: id, createdAt, updatedAt
+│   ├── Domain.java                      # Technical rules (type, length, decimals)
+│   ├── DataElement.java                 # Business meaning (labels, references a Domain)
+│   ├── TableDefinition.java             # Logical table (name, schema level)
+│   ├── TableField.java                  # Column (references a Table + Data Element)
+│   ├── SearchHelp.java                  # Lookup mechanism (references a Table)
+│   └── ExtensionFieldValue.java         # Custom Z-field values (EAV pattern)
+├── dto/                                 # Request/response records
+│   ├── CreateDomainRequest.java         # What you POST to create a domain
+│   ├── DomainDto.java                   # What the API returns after creating
+│   ├── CreateDataElementRequest.java
+│   ├── DataElementDto.java
+│   ├── CreateTableDefinitionRequest.java
+│   ├── TableDefinitionDto.java
+│   ├── CreateTableFieldRequest.java
+│   ├── TableFieldDto.java
+│   ├── CreateExtensionFieldValueRequest.java
+│   ├── ExtensionFieldValueDto.java
+│   ├── CreateSearchHelpRequest.java
+│   └── SearchHelpDto.java
+├── service/                             # Business logic (validation, caching)
+│   ├── DomainService.java
+│   ├── DataElementService.java
+│   ├── TableDefinitionService.java
+│   ├── TableFieldService.java
+│   ├── ExtensionFieldService.java
+│   └── SearchHelpService.java
+├── controller/                          # REST API endpoints
+│   ├── DomainController.java            # /api/v1/ddic/domains
+│   ├── DataElementController.java       # /api/v1/ddic/data-elements
+│   ├── TableDefinitionController.java   # /api/v1/ddic/tables
+│   ├── TableFieldController.java        # /api/v1/ddic/fields
+│   ├── ExtensionFieldController.java    # /api/v1/ddic/extensions
+│   └── SearchHelpController.java        # /api/v1/ddic/search-helps
+├── mapper/                              # Entity ↔ DTO conversion
+├── repository/                          # Spring Data JPA repositories
+├── model/
+│   └── SchemaLevel.java                 # EXTERNAL, CONCEPTUAL, INTERNAL enum
+└── exception/                           # Shared exception classes (used project-wide)
+    ├── EntityNotFoundException.java
+    ├── DuplicateEntityException.java
+    ├── ValidationException.java
+    └── GlobalExceptionHandler.java
 ```
 
-#### How the layers connect
+---
 
+#### 9.3.5 The database schema (Flyway migration)
+
+All DDIC tables are created by `src/main/resources/db/migration/V2__ddic_schema.sql`. This runs automatically when the application starts. Here is the complete migration:
+
+```sql
+-- Domains define technical attributes (data type, length, value range)
+CREATE TABLE ddic_domain (
+    id              BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    domain_name     VARCHAR(30) NOT NULL UNIQUE,
+    data_type       VARCHAR(20) NOT NULL,
+    max_length      INTEGER,
+    decimal_places  INTEGER DEFAULT 0,
+    description     VARCHAR(255),
+    created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Data Elements define semantic attributes and reference a domain
+CREATE TABLE ddic_data_element (
+    id              BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    element_name    VARCHAR(30) NOT NULL UNIQUE,
+    domain_id       BIGINT NOT NULL REFERENCES ddic_domain(id),
+    short_label     VARCHAR(10),
+    medium_label    VARCHAR(20),
+    long_label      VARCHAR(40),
+    description     VARCHAR(255),
+    created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table Definitions with schema level (ANSI/SPARC three-schema model)
+CREATE TABLE ddic_table_definition (
+    id                  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    table_name          VARCHAR(30) NOT NULL UNIQUE,
+    schema_level        VARCHAR(20) NOT NULL,
+    description         VARCHAR(255),
+    is_client_specific  BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_schema_level CHECK (schema_level IN ('EXTERNAL', 'CONCEPTUAL', 'INTERNAL'))
+);
+
+-- Table Fields (columns) referencing data elements
+CREATE TABLE ddic_table_field (
+    id                    BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    table_definition_id   BIGINT NOT NULL REFERENCES ddic_table_definition(id),
+    field_name            VARCHAR(30) NOT NULL,
+    data_element_id       BIGINT NOT NULL REFERENCES ddic_data_element(id),
+    position              INTEGER NOT NULL,
+    is_key                BOOLEAN NOT NULL DEFAULT FALSE,
+    is_nullable           BOOLEAN NOT NULL DEFAULT TRUE,
+    is_extension          BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at            TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at            TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uk_table_field UNIQUE (table_definition_id, field_name)
+);
+
+-- Search Helps for field value lookups
+CREATE TABLE ddic_search_help (
+    id                    BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    search_help_name      VARCHAR(30) NOT NULL UNIQUE,
+    table_definition_id   BIGINT NOT NULL REFERENCES ddic_table_definition(id),
+    description           VARCHAR(255),
+    created_at            TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at            TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Extension field values for client-specific "Z" fields (EAV pattern)
+CREATE TABLE ddic_extension_field_value (
+    id              BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    table_name      VARCHAR(30) NOT NULL,
+    record_id       BIGINT NOT NULL,
+    field_name      VARCHAR(30) NOT NULL,
+    field_value     VARCHAR(1024),
+    created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uk_extension_value UNIQUE (table_name, record_id, field_name)
+);
 ```
-Domain  →  defines allowed values (e.g., length, type)
-   ↓
-DataElement  →  gives the domain a business meaning (e.g., "Customer Name")
-   ↓
-TableField  →  places the data element into a specific table column
-   ↓
-TableDefinition  →  groups fields into a table at a specific schema level
-```
 
-#### Three-schema levels
+---
 
-```java
-public enum SchemaLevel {
-    EXTERNAL,     // How users see the data (views, APIs)
-    CONCEPTUAL,   // The logical model (business entities)
-    INTERNAL      // Physical storage (database tables)
-}
-```
+#### 9.3.6 The real entity classes
 
-#### Z-field extensions — custom fields without modifying the core
+Each DDIC building block is a JPA entity. Here are the key ones with annotations explained:
 
-Clients can add custom fields prefixed with `Z_` to any table without changing the core schema. This uses the **Entity-Attribute-Value (EAV)** pattern:
+**Domain** — the foundation (`src/main/java/com/erp/kernel/ddic/entity/Domain.java`):
 
 ```java
 @Entity
-@Table(name = "ddic_extension_field_value")
-public class ExtensionFieldValue extends BaseEntity {
+@Table(name = "ddic_domain")
+public class Domain extends BaseEntity {
 
-    @Column(name = "table_name", nullable = false, length = 30)
-    private String tableName;        // Which table this extends
+    @Column(name = "domain_name", nullable = false, unique = true, length = 30)
+    private String domainName;       // e.g., "CHAR_100", "NUMC_10", "DEC_13_2"
 
-    @Column(name = "record_id", nullable = false)
-    private Long recordId;           // Which row in that table
+    @Column(name = "data_type", nullable = false, length = 20)
+    private String dataType;         // CHAR, NUMC, DEC, INT, DATS, TIMS
 
-    @Column(name = "field_name", nullable = false, length = 30)
-    private String fieldName;        // Must start with "Z_"
+    @Column(name = "max_length")
+    private Integer maxLength;       // e.g., 100 for a 100-character string
 
-    @Column(name = "field_value", length = 1024)
-    private String fieldValue;       // The custom value
+    @Column(name = "decimal_places")
+    private Integer decimalPlaces;   // e.g., 2 for prices like 19.99
+
+    @Column(name = "description")
+    private String description;
 }
 ```
 
-The service validates that all custom field names start with `Z_`:
+**Data Element** — adds business meaning (`src/main/java/com/erp/kernel/ddic/entity/DataElement.java`):
 
 ```java
-private static final String EXTENSION_PREFIX = "Z_";
+@Entity
+@Table(name = "ddic_data_element")
+public class DataElement extends BaseEntity {
 
-private void validateFieldName(final String fieldName) {
-    if (!fieldName.startsWith(EXTENSION_PREFIX)) {
-        throw new ValidationException(
-            "Extension field name must start with '%s', got '%s'"
-                .formatted(EXTENSION_PREFIX, fieldName));
+    @Column(name = "element_name", nullable = false, unique = true, length = 30)
+    private String elementName;      // e.g., "CUST_NAME_EL"
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "domain_id", nullable = false)
+    private Domain domain;           // Links to the referenced domain → inherits type + length
+
+    @Column(name = "short_label", length = 10)
+    private String shortLabel;       // "Name"       — for narrow columns / mobile
+
+    @Column(name = "medium_label", length = 20)
+    private String mediumLabel;      // "Cust Name"  — for medium-width columns
+
+    @Column(name = "long_label", length = 40)
+    private String longLabel;        // "Customer Name" — for full-width displays
+
+    @Column(name = "description")
+    private String description;      // "Full legal name of the customer"
+}
+```
+
+**Table Definition** — describes a table (`src/main/java/com/erp/kernel/ddic/entity/TableDefinition.java`):
+
+```java
+@Entity
+@Table(name = "ddic_table_definition")
+public class TableDefinition extends BaseEntity {
+
+    @Column(name = "table_name", nullable = false, unique = true, length = 30)
+    private String tableName;        // e.g., "CUSTOMERS"
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "schema_level", nullable = false, length = 20)
+    private SchemaLevel schemaLevel; // EXTERNAL, CONCEPTUAL, or INTERNAL
+
+    @Column(name = "description")
+    private String description;      // "Master data for all customers"
+
+    @Column(name = "is_client_specific", nullable = false)
+    private boolean clientSpecific;  // true = data is isolated per client/tenant
+}
+```
+
+**Table Field** — a column within a table (`src/main/java/com/erp/kernel/ddic/entity/TableField.java`):
+
+```java
+@Entity
+@Table(name = "ddic_table_field",
+       uniqueConstraints = @UniqueConstraint(columnNames = {"table_definition_id", "field_name"}))
+public class TableField extends BaseEntity {
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "table_definition_id", nullable = false)
+    private TableDefinition tableDefinition;  // Which table this field belongs to
+
+    @Column(name = "field_name", nullable = false, length = 30)
+    private String fieldName;                 // e.g., "CUST_NAME" or "Z_LOYALTY_TIER"
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "data_element_id", nullable = false)
+    private DataElement dataElement;          // Links to data element → inherits labels
+
+    @Column(name = "position", nullable = false)
+    private int position;                     // Column order: 1, 2, 3, ...
+
+    @Column(name = "is_key", nullable = false)
+    private boolean key;                      // true = part of the primary key
+
+    @Column(name = "is_nullable", nullable = false)
+    private boolean nullable;                 // true = allows NULL values
+
+    @Column(name = "is_extension", nullable = false)
+    private boolean extension;                // true = this is a Z-field (client extension)
+}
+```
+
+**BaseEntity** — shared fields for all entities (`src/main/java/com/erp/kernel/ddic/entity/BaseEntity.java`):
+
+```java
+@MappedSuperclass
+public abstract class BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        final var now = Instant.now();
+        this.createdAt = now;
+        this.updatedAt = now;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = Instant.now();
     }
 }
 ```
 
-#### API endpoints
+> Every DDIC entity inherits `id`, `createdAt`, and `updatedAt` from `BaseEntity`. Timestamps are set automatically — you never need to set them manually.
 
-```
-POST /api/v1/ddic/tables          Create a table definition
-GET  /api/v1/ddic/tables          List tables (optionally filter by schema level)
-POST /api/v1/ddic/fields          Create a field within a table
-POST /api/v1/ddic/domains         Create a domain
-POST /api/v1/ddic/data-elements   Create a data element
-POST /api/v1/ddic/search-helps    Create a search help
-POST /api/v1/ddic/extensions      Save a Z-field extension value
-GET  /api/v1/ddic/extensions      List extension values
+---
+
+#### 9.3.7 The request and response DTOs
+
+This project uses Java **records** for DTOs — they are immutable data containers. Here are the key ones:
+
+**Creating a Domain** — what you send in the POST body:
+
+```java
+// File: src/main/java/com/erp/kernel/ddic/dto/CreateDomainRequest.java
+public record CreateDomainRequest(
+    @NotBlank @Size(max = 30) String domainName,     // Required, max 30 chars
+    @NotBlank @Size(max = 20) String dataType,        // Required: CHAR, NUMC, DEC, INT...
+    Integer maxLength,                                // Optional: e.g., 100
+    Integer decimalPlaces,                            // Optional: e.g., 2
+    @Size(max = 255) String description               // Optional
+) {}
 ```
 
-#### Try it yourself
+**Domain response** — what the API returns:
+
+```java
+// File: src/main/java/com/erp/kernel/ddic/dto/DomainDto.java
+public record DomainDto(
+    Long id,                 // Auto-generated by the database
+    String domainName,
+    String dataType,
+    Integer maxLength,
+    Integer decimalPlaces,
+    String description,
+    Instant createdAt,       // Set automatically
+    Instant updatedAt        // Set automatically
+) {}
+```
+
+**Creating a Data Element** — references a Domain by ID:
+
+```java
+// File: src/main/java/com/erp/kernel/ddic/dto/CreateDataElementRequest.java
+public record CreateDataElementRequest(
+    @NotBlank @Size(max = 30) String elementName,
+    @NotNull Long domainId,                          // Must reference an existing Domain
+    @Size(max = 10) String shortLabel,               // e.g., "Name"
+    @Size(max = 20) String mediumLabel,              // e.g., "Cust Name"
+    @Size(max = 40) String longLabel,                // e.g., "Customer Name"
+    @Size(max = 255) String description
+) {}
+```
+
+**Creating a Table Definition**:
+
+```java
+// File: src/main/java/com/erp/kernel/ddic/dto/CreateTableDefinitionRequest.java
+public record CreateTableDefinitionRequest(
+    @NotBlank @Size(max = 30) String tableName,
+    @NotNull SchemaLevel schemaLevel,                // EXTERNAL, CONCEPTUAL, or INTERNAL
+    @Size(max = 255) String description,
+    boolean clientSpecific                           // true = tenant-isolated data
+) {}
+```
+
+**Creating a Table Field** — references both a Table Definition and a Data Element:
+
+```java
+// File: src/main/java/com/erp/kernel/ddic/dto/CreateTableFieldRequest.java
+public record CreateTableFieldRequest(
+    @NotNull Long tableDefinitionId,                 // Which table this field belongs to
+    @NotBlank @Size(max = 30) String fieldName,      // Column name (Z_ prefix for extensions)
+    @NotNull Long dataElementId,                     // Which data element provides the labels
+    @Min(1) int position,                            // Column order (1, 2, 3, ...)
+    boolean key,                                     // Is this a primary key field?
+    boolean nullable,                                // Can this field be NULL?
+    boolean extension                                // Is this a Z-field (client extension)?
+) {}
+```
+
+**Creating a Z-field Extension Value**:
+
+```java
+// File: src/main/java/com/erp/kernel/ddic/dto/CreateExtensionFieldValueRequest.java
+public record CreateExtensionFieldValueRequest(
+    @NotBlank @Size(max = 30) String tableName,      // Which table the record belongs to
+    @NotNull Long recordId,                          // Which row in that table
+    @NotBlank @Size(max = 30) String fieldName,      // Must start with "Z_"
+    @Size(max = 1024) String fieldValue              // The custom value to store
+) {}
+```
+
+---
+
+#### 9.3.8 The service layer — business logic and validation
+
+Each DDIC component has a dedicated service. They all follow the same pattern: validate input → check for duplicates → save → return DTO. Here are the most important ones:
+
+**DomainService** — creating a domain (`src/main/java/com/erp/kernel/ddic/service/DomainService.java`):
+
+```java
+@Service
+@Transactional(readOnly = true)
+public class DomainService {
+
+    private final DomainRepository domainRepository;
+
+    public DomainService(final DomainRepository domainRepository) {
+        this.domainRepository = Objects.requireNonNull(domainRepository,
+            "domainRepository must not be null");
+    }
+
+    @Transactional
+    @CacheEvict(value = "domains", allEntries = true)
+    public DomainDto create(final CreateDomainRequest request) {
+        Objects.requireNonNull(request, "request must not be null");
+        // Check for duplicate names
+        if (domainRepository.existsByDomainName(request.domainName())) {
+            throw new DuplicateEntityException(
+                "Domain with name '%s' already exists".formatted(request.domainName()));
+        }
+        final var entity = DomainMapper.toEntity(request);
+        final var saved = domainRepository.save(entity);
+        return DomainMapper.toDto(saved);
+    }
+
+    @Cacheable(value = "domains", key = "#id")
+    public DomainDto findById(final Long id) {
+        Objects.requireNonNull(id, "id must not be null");
+        return domainRepository.findById(id)
+            .map(DomainMapper::toDto)
+            .orElseThrow(() -> new EntityNotFoundException(
+                "Domain with id %d not found".formatted(id)));
+    }
+
+    @Cacheable(value = "domains", key = "'all'")
+    public List<DomainDto> findAll() {
+        return domainRepository.findAll().stream()
+            .map(DomainMapper::toDto)
+            .toList();
+    }
+}
+```
+
+**DataElementService** — creating a data element that references a domain (`src/main/java/com/erp/kernel/ddic/service/DataElementService.java`):
+
+```java
+@Service
+@Transactional(readOnly = true)
+public class DataElementService {
+
+    private final DataElementRepository dataElementRepository;
+    private final DomainRepository domainRepository;
+
+    @Transactional
+    @CacheEvict(value = "dataElements", allEntries = true)
+    public DataElementDto create(final CreateDataElementRequest request) {
+        Objects.requireNonNull(request, "request must not be null");
+        if (dataElementRepository.existsByElementName(request.elementName())) {
+            throw new DuplicateEntityException(
+                "Data element with name '%s' already exists".formatted(request.elementName()));
+        }
+        // Look up the referenced domain — fail if it doesn't exist
+        final var domain = domainRepository.findById(request.domainId())
+            .orElseThrow(() -> new EntityNotFoundException(
+                "Domain with id %d not found".formatted(request.domainId())));
+        final var entity = DataElementMapper.toEntity(request, domain);
+        final var saved = dataElementRepository.save(entity);
+        return DataElementMapper.toDto(saved);
+    }
+}
+```
+
+**TableFieldService** — the Z-field validation logic (`src/main/java/com/erp/kernel/ddic/service/TableFieldService.java`):
+
+```java
+@Service
+@Transactional(readOnly = true)
+public class TableFieldService {
+
+    private static final String EXTENSION_PREFIX = "Z_";
+
+    @Transactional
+    public TableFieldDto create(final CreateTableFieldRequest request) {
+        Objects.requireNonNull(request, "request must not be null");
+
+        // KEY VALIDATION: if this is marked as an extension field,
+        // the field name MUST start with "Z_"
+        validateExtensionFieldName(request);
+
+        final var tableDefinition = tableDefinitionRepository.findById(request.tableDefinitionId())
+            .orElseThrow(() -> new EntityNotFoundException(
+                "Table definition with id %d not found".formatted(request.tableDefinitionId())));
+        final var dataElement = dataElementRepository.findById(request.dataElementId())
+            .orElseThrow(() -> new EntityNotFoundException(
+                "Data element with id %d not found".formatted(request.dataElementId())));
+
+        // No duplicate field names in the same table
+        if (tableFieldRepository.existsByTableDefinitionIdAndFieldName(
+                request.tableDefinitionId(), request.fieldName())) {
+            throw new DuplicateEntityException(
+                "Field '%s' already exists in table definition %d"
+                    .formatted(request.fieldName(), request.tableDefinitionId()));
+        }
+
+        final var entity = TableFieldMapper.toEntity(request, tableDefinition, dataElement);
+        final var saved = tableFieldRepository.save(entity);
+        return TableFieldMapper.toDto(saved);
+    }
+
+    // You can query only extension fields for a table
+    public List<TableFieldDto> findExtensionFields(final Long tableDefinitionId) {
+        return tableFieldRepository.findByTableDefinitionIdAndExtensionTrue(tableDefinitionId)
+            .stream()
+            .map(TableFieldMapper::toDto)
+            .toList();
+    }
+
+    private void validateExtensionFieldName(final CreateTableFieldRequest request) {
+        if (request.extension() && !request.fieldName().startsWith(EXTENSION_PREFIX)) {
+            throw new ValidationException(
+                "Extension field name must start with '%s', got '%s'"
+                    .formatted(EXTENSION_PREFIX, request.fieldName()));
+        }
+    }
+}
+```
+
+**ExtensionFieldService** — storing custom Z-field values (`src/main/java/com/erp/kernel/ddic/service/ExtensionFieldService.java`):
+
+```java
+@Service
+@Transactional(readOnly = true)
+public class ExtensionFieldService {
+
+    private static final String EXTENSION_PREFIX = "Z_";
+
+    @Transactional
+    public ExtensionFieldValueDto save(final CreateExtensionFieldValueRequest request) {
+        Objects.requireNonNull(request, "request must not be null");
+        validateFieldName(request.fieldName());
+
+        // Upsert: update if the value already exists, create if it does not
+        final var entity = extensionFieldValueRepository
+            .findByTableNameAndRecordIdAndFieldName(
+                request.tableName(), request.recordId(), request.fieldName())
+            .map(existing -> {
+                ExtensionFieldValueMapper.updateEntity(existing, request);
+                return existing;
+            })
+            .orElseGet(() -> ExtensionFieldValueMapper.toEntity(request));
+
+        final var saved = extensionFieldValueRepository.save(entity);
+        return ExtensionFieldValueMapper.toDto(saved);
+    }
+
+    public List<ExtensionFieldValueDto> findByRecord(final String tableName, final Long recordId) {
+        return extensionFieldValueRepository.findByTableNameAndRecordId(tableName, recordId)
+            .stream()
+            .map(ExtensionFieldValueMapper::toDto)
+            .toList();
+    }
+
+    private void validateFieldName(final String fieldName) {
+        if (!fieldName.startsWith(EXTENSION_PREFIX)) {
+            throw new ValidationException(
+                "Extension field name must start with '%s', got '%s'"
+                    .formatted(EXTENSION_PREFIX, fieldName));
+        }
+    }
+}
+```
+
+---
+
+#### 9.3.9 The REST API endpoints
+
+Each DDIC component has full CRUD endpoints. Here is the complete list:
+
+| Resource | Method | Endpoint | What it does |
+|---|---|---|---|
+| **Domains** | POST | `/api/v1/ddic/domains` | Create a new domain |
+| | GET | `/api/v1/ddic/domains` | List all domains |
+| | GET | `/api/v1/ddic/domains/{id}` | Get a domain by ID |
+| | PUT | `/api/v1/ddic/domains/{id}` | Update a domain |
+| | DELETE | `/api/v1/ddic/domains/{id}` | Delete a domain |
+| **Data Elements** | POST | `/api/v1/ddic/data-elements` | Create a data element (references a domain) |
+| | GET | `/api/v1/ddic/data-elements` | List all data elements |
+| | GET | `/api/v1/ddic/data-elements/{id}` | Get a data element by ID |
+| | PUT | `/api/v1/ddic/data-elements/{id}` | Update a data element |
+| | DELETE | `/api/v1/ddic/data-elements/{id}` | Delete a data element |
+| **Table Definitions** | POST | `/api/v1/ddic/tables` | Create a table definition |
+| | GET | `/api/v1/ddic/tables` | List all tables (optional `?schemaLevel=CONCEPTUAL` filter) |
+| | GET | `/api/v1/ddic/tables/{id}` | Get a table by ID |
+| | PUT | `/api/v1/ddic/tables/{id}` | Update a table |
+| | DELETE | `/api/v1/ddic/tables/{id}` | Delete a table |
+| **Table Fields** | POST | `/api/v1/ddic/fields` | Create a field in a table |
+| | GET | `/api/v1/ddic/fields?tableDefinitionId=1` | List fields for a table |
+| | GET | `/api/v1/ddic/fields?tableDefinitionId=1&extensionsOnly=true` | List only Z-fields |
+| | GET | `/api/v1/ddic/fields/{id}` | Get a field by ID |
+| | DELETE | `/api/v1/ddic/fields/{id}` | Delete a field |
+| **Search Helps** | POST | `/api/v1/ddic/search-helps` | Create a search help |
+| | GET | `/api/v1/ddic/search-helps` | List all search helps |
+| | GET | `/api/v1/ddic/search-helps/{id}` | Get a search help by ID |
+| | PUT | `/api/v1/ddic/search-helps/{id}` | Update a search help |
+| | DELETE | `/api/v1/ddic/search-helps/{id}` | Delete a search help |
+| **Extension Values** | POST | `/api/v1/ddic/extensions` | Create or update a Z-field value |
+| | GET | `/api/v1/ddic/extensions?tableName=X&recordId=1` | List Z-field values for a record |
+| | DELETE | `/api/v1/ddic/extensions/{id}` | Delete a Z-field value |
+
+---
+
+#### 9.3.10 Complete walkthrough — building a CUSTOMERS table from scratch
+
+This step-by-step tutorial uses `curl` commands against the running application. Start the backend first (`./gradlew bootRun`), then follow each step in order. Each step builds on the previous one.
+
+> **Note:** The `id` values in the responses below (e.g., `"id": 1`) are auto-generated by the database and may differ on your machine if other records already exist. Use the actual `id` values from your responses when referencing them in later steps.
+
+**Step 1 — Create the Domains** (technical rules):
 
 ```bash
-# Create a domain
-curl -X POST http://localhost:8080/api/v1/ddic/domains \
+# Domain for customer names: text, max 100 characters
+curl -s -X POST http://localhost:8080/api/v1/ddic/domains \
   -H "Content-Type: application/json" \
   -d '{
-    "domainName": "CUSTOMER_NAME",
-    "description": "Customer name domain",
+    "domainName": "CHAR_100",
     "dataType": "CHAR",
-    "length": 100
-  }'
+    "maxLength": 100,
+    "description": "Character field up to 100 characters"
+  }' | jq .
+# Response: { "id": 1, "domainName": "CHAR_100", ... }
 
-# Add a Z-field extension
-curl -X POST http://localhost:8080/api/v1/ddic/extensions \
+# Domain for country codes: text, max 3 characters
+curl -s -X POST http://localhost:8080/api/v1/ddic/domains \
   -H "Content-Type: application/json" \
   -d '{
-    "tableName": "CUSTOMER",
+    "domainName": "CHAR_3",
+    "dataType": "CHAR",
+    "maxLength": 3,
+    "description": "Character field up to 3 characters"
+  }' | jq .
+# Response: { "id": 2, "domainName": "CHAR_3", ... }
+
+# Domain for monetary amounts: decimal, 13 digits, 2 decimal places
+curl -s -X POST http://localhost:8080/api/v1/ddic/domains \
+  -H "Content-Type: application/json" \
+  -d '{
+    "domainName": "DEC_13_2",
+    "dataType": "DEC",
+    "maxLength": 13,
+    "decimalPlaces": 2,
+    "description": "Decimal field for monetary amounts"
+  }' | jq .
+# Response: { "id": 3, "domainName": "DEC_13_2", ... }
+```
+
+**Step 2 — Create the Data Elements** (business meaning + labels):
+
+```bash
+# Data element for customer name (references domain id=1, CHAR_100)
+curl -s -X POST http://localhost:8080/api/v1/ddic/data-elements \
+  -H "Content-Type: application/json" \
+  -d '{
+    "elementName": "CUST_NAME",
+    "domainId": 1,
+    "shortLabel": "Name",
+    "mediumLabel": "Cust Name",
+    "longLabel": "Customer Name",
+    "description": "Full legal name of the customer"
+  }' | jq .
+# Response: { "id": 1, "elementName": "CUST_NAME", "domainId": 1, "domainName": "CHAR_100", ... }
+
+# Data element for country code (references domain id=2, CHAR_3)
+curl -s -X POST http://localhost:8080/api/v1/ddic/data-elements \
+  -H "Content-Type: application/json" \
+  -d '{
+    "elementName": "COUNTRY_CD",
+    "domainId": 2,
+    "shortLabel": "Ctry",
+    "mediumLabel": "Country",
+    "longLabel": "Country Code",
+    "description": "ISO 3166-1 alpha-3 country code"
+  }' | jq .
+# Response: { "id": 2, "elementName": "COUNTRY_CD", "domainId": 2, "domainName": "CHAR_3", ... }
+
+# Data element for credit limit (references domain id=3, DEC_13_2)
+curl -s -X POST http://localhost:8080/api/v1/ddic/data-elements \
+  -H "Content-Type: application/json" \
+  -d '{
+    "elementName": "CREDIT_LIMIT",
+    "domainId": 3,
+    "shortLabel": "Limit",
+    "mediumLabel": "Credit Lmt",
+    "longLabel": "Credit Limit Amount",
+    "description": "Maximum credit limit in local currency"
+  }' | jq .
+# Response: { "id": 3, "elementName": "CREDIT_LIMIT", "domainId": 3, "domainName": "DEC_13_2", ... }
+```
+
+**Step 3 — Create the Table Definition**:
+
+```bash
+# Create the CUSTOMERS table at the CONCEPTUAL schema level
+curl -s -X POST http://localhost:8080/api/v1/ddic/tables \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tableName": "CUSTOMERS",
+    "schemaLevel": "CONCEPTUAL",
+    "description": "Master data for all customers",
+    "clientSpecific": true
+  }' | jq .
+# Response: { "id": 1, "tableName": "CUSTOMERS", "schemaLevel": "CONCEPTUAL", ... }
+```
+
+**Step 4 — Add Fields (columns) to the Table**:
+
+```bash
+# Field 1: CUST_NAME (position 1, not a key, not nullable, not an extension)
+curl -s -X POST http://localhost:8080/api/v1/ddic/fields \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tableDefinitionId": 1,
+    "fieldName": "CUST_NAME",
+    "dataElementId": 1,
+    "position": 1,
+    "key": false,
+    "nullable": false,
+    "extension": false
+  }' | jq .
+
+# Field 2: COUNTRY (position 2, not a key, nullable, not an extension)
+curl -s -X POST http://localhost:8080/api/v1/ddic/fields \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tableDefinitionId": 1,
+    "fieldName": "COUNTRY",
+    "dataElementId": 2,
+    "position": 2,
+    "key": false,
+    "nullable": true,
+    "extension": false
+  }' | jq .
+
+# Field 3: CREDIT_LIMIT (position 3, not a key, nullable, not an extension)
+curl -s -X POST http://localhost:8080/api/v1/ddic/fields \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tableDefinitionId": 1,
+    "fieldName": "CREDIT_LIMIT",
+    "dataElementId": 3,
+    "position": 3,
+    "key": false,
+    "nullable": true,
+    "extension": false
+  }' | jq .
+```
+
+**Step 5 — Verify what you built**:
+
+```bash
+# List all fields in the CUSTOMERS table (ordered by position)
+curl -s "http://localhost:8080/api/v1/ddic/fields?tableDefinitionId=1" | jq .
+# Returns an array of 3 fields: CUST_NAME, COUNTRY, CREDIT_LIMIT
+
+# Filter only CONCEPTUAL tables
+curl -s "http://localhost:8080/api/v1/ddic/tables?schemaLevel=CONCEPTUAL" | jq .
+```
+
+**Step 6 — Create a Search Help** (lookup dropdown):
+
+```bash
+# Search help for the CUSTOMERS table — enables a dropdown lookup
+curl -s -X POST http://localhost:8080/api/v1/ddic/search-helps \
+  -H "Content-Type: application/json" \
+  -d '{
+    "searchHelpName": "SH_CUSTOMER",
+    "tableDefinitionId": 1,
+    "description": "Search help for customer lookup"
+  }' | jq .
+```
+
+At this point you have built a complete DDIC structure:
+
+```
+Domain CHAR_100           Domain CHAR_3           Domain DEC_13_2
+    ↓                        ↓                       ↓
+DataElement CUST_NAME    DataElement COUNTRY_CD   DataElement CREDIT_LIMIT
+    ↓                        ↓                       ↓
+Field CUST_NAME (pos 1)  Field COUNTRY (pos 2)   Field CREDIT_LIMIT (pos 3)
+    └────────────────────────┴───────────────────────┘
+                             ↓
+              Table Definition: CUSTOMERS (CONCEPTUAL)
+                             ↑
+              Search Help: SH_CUSTOMER
+```
+
+---
+
+#### 9.3.11 What are Z-fields and why do they exist?
+
+**The problem:** Imagine the ERP Kernel is shipped to 50 different clients. A hospital client needs a `BLOOD_TYPE` field on their patient table. A retail client needs a `LOYALTY_TIER` field on their customer table. You cannot add these columns to the core database schema because:
+
+1. The core team does not know every client's needs.
+2. Modifying the core schema for one client would affect all other clients.
+3. Each client's customisations would conflict with each other.
+
+**The solution: Z-fields.** Any field whose name starts with `Z_` is a client-specific extension. The "Z" prefix is a convention borrowed from SAP — it means "this is custom, not part of the standard product."
+
+There are **two ways** Z-fields work in this project:
+
+**Way 1: Z-fields as Table Fields (schema-level):**
+
+These are defined in the DDIC as Table Fields with `extension: true`. They describe **what custom fields exist** for a table — like adding a column definition. The service enforces that the field name starts with `Z_`:
+
+```bash
+# First, create a domain and data element for the Z-field
+curl -s -X POST http://localhost:8080/api/v1/ddic/domains \
+  -H "Content-Type: application/json" \
+  -d '{
+    "domainName": "CHAR_20",
+    "dataType": "CHAR",
+    "maxLength": 20,
+    "description": "Character field up to 20 characters"
+  }' | jq .
+# Response: { "id": 4, ... }
+
+curl -s -X POST http://localhost:8080/api/v1/ddic/data-elements \
+  -H "Content-Type: application/json" \
+  -d '{
+    "elementName": "LOYALTY_TIER",
+    "domainId": 4,
+    "shortLabel": "Tier",
+    "mediumLabel": "Loyalty",
+    "longLabel": "Customer Loyalty Tier",
+    "description": "Client-specific loyalty programme tier"
+  }' | jq .
+# Response: { "id": 4, ... }
+
+# Now add the Z-field to the CUSTOMERS table
+curl -s -X POST http://localhost:8080/api/v1/ddic/fields \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tableDefinitionId": 1,
+    "fieldName": "Z_LOYALTY_TIER",
+    "dataElementId": 4,
+    "position": 4,
+    "key": false,
+    "nullable": true,
+    "extension": true
+  }' | jq .
+```
+
+> **Validation rule:** If `extension` is `true` but the field name does not start with `Z_`, the API returns a `400 Bad Request` with the message: _"Extension field name must start with 'Z_', got 'LOYALTY_TIER'"_.
+
+You can query only the extension fields for a table:
+
+```bash
+curl -s "http://localhost:8080/api/v1/ddic/fields?tableDefinitionId=1&extensionsOnly=true" | jq .
+# Returns only: Z_LOYALTY_TIER
+```
+
+**Way 2: Extension Field Values (data-level, EAV pattern):**
+
+While Table Fields describe **what custom columns exist**, Extension Field Values store the **actual data** for those columns. This uses the **Entity-Attribute-Value (EAV)** pattern — instead of adding a physical column to a database table, you store each custom value as a separate row:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Traditional approach (adding a column):                     │
+│                                                              │
+│  CUSTOMERS table:                                            │
+│  | id | name   | country | credit_limit | Z_LOYALTY_TIER |   │
+│  | 1  | Acme   | USA     | 50000.00     | GOLD           |   │
+│  | 2  | GlobalCo| GBR    | 100000.00    | PLATINUM       |   │
+│                                                              │
+│  Problem: Requires ALTER TABLE — modifies the core schema!   │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  EAV approach (what this project uses):                      │
+│                                                              │
+│  ddic_extension_field_value table:                           │
+│  | table_name | record_id | field_name      | field_value |  │
+│  | CUSTOMERS  | 1         | Z_LOYALTY_TIER  | GOLD        |  │
+│  | CUSTOMERS  | 2         | Z_LOYALTY_TIER  | PLATINUM    |  │
+│  | CUSTOMERS  | 1         | Z_REGION        | NORTHEAST   |  │
+│                                                              │
+│  Advantage: No schema changes needed! Just insert rows.      │
+└─────────────────────────────────────────────────────────────┘
+```
+
+Here is how to store and retrieve Z-field values:
+
+```bash
+# Store a Z-field value: customer #1 has loyalty tier "GOLD"
+curl -s -X POST http://localhost:8080/api/v1/ddic/extensions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tableName": "CUSTOMERS",
     "recordId": 1,
     "fieldName": "Z_LOYALTY_TIER",
     "fieldValue": "GOLD"
-  }'
+  }' | jq .
+
+# Store another Z-field value: customer #1 also has region "NORTHEAST"
+curl -s -X POST http://localhost:8080/api/v1/ddic/extensions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tableName": "CUSTOMERS",
+    "recordId": 1,
+    "fieldName": "Z_REGION",
+    "fieldValue": "NORTHEAST"
+  }' | jq .
+
+# Retrieve all Z-field values for customer #1
+curl -s "http://localhost:8080/api/v1/ddic/extensions?tableName=CUSTOMERS&recordId=1" | jq .
+# Returns: [ { "fieldName": "Z_LOYALTY_TIER", "fieldValue": "GOLD" },
+#             { "fieldName": "Z_REGION", "fieldValue": "NORTHEAST" } ]
+
+# Update a Z-field value: change loyalty tier to "PLATINUM"
+# The save endpoint is an UPSERT — if the value exists, it updates; otherwise, it creates
+curl -s -X POST http://localhost:8080/api/v1/ddic/extensions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tableName": "CUSTOMERS",
+    "recordId": 1,
+    "fieldName": "Z_LOYALTY_TIER",
+    "fieldValue": "PLATINUM"
+  }' | jq .
 ```
+
+> **Validation rule:** Extension field names must start with `Z_`. If you try to create a value with field name `LOYALTY_TIER` (without the `Z_` prefix), the API returns `400 Bad Request`.
+
+---
+
+#### 9.3.12 How to add a new DDIC feature as a developer
+
+If you need to add a new DDIC component (e.g., a "Structure" type), follow this pattern:
+
+1. **Entity** — Create the JPA entity in `ddic/entity/` extending `BaseEntity`
+2. **Repository** — Create a Spring Data JPA repository in `ddic/repository/`
+3. **DTO** — Create a `Create*Request` record and a `*Dto` record in `ddic/dto/`
+4. **Mapper** — Create a mapper class in `ddic/mapper/` with `toEntity()`, `toDto()`, and `updateEntity()` methods
+5. **Service** — Create a service in `ddic/service/` with create/findById/findAll/update/delete methods
+6. **Controller** — Create a REST controller in `ddic/controller/` mapping to `/api/v1/ddic/your-resource`
+7. **Migration** — Create a new Flyway migration (`V8__your_table.sql`) in `src/main/resources/db/migration/`
+8. **Tests** — Write unit tests for the service and `@WebMvcTest` tests for the controller with 100% coverage
+
+> **Tip:** Copy an existing DDIC component (like Domain) as a starting point. The pattern is identical for every component.
+
+---
+
+#### 9.3.13 DDIC quick reference
+
+| What you want to do | API call | Notes |
+|---|---|---|
+| Define a new data type rule | `POST /api/v1/ddic/domains` | Always create domains first |
+| Give a field business meaning | `POST /api/v1/ddic/data-elements` | Must reference an existing domain ID |
+| Register a logical table | `POST /api/v1/ddic/tables` | Choose schema level: EXTERNAL, CONCEPTUAL, or INTERNAL |
+| Add a column to a table | `POST /api/v1/ddic/fields` | Must reference a table ID and data element ID |
+| Add a client-custom column | `POST /api/v1/ddic/fields` with `extension: true` | Field name must start with `Z_` |
+| Store a custom value for a record | `POST /api/v1/ddic/extensions` | Field name must start with `Z_`; works as upsert |
+| Get all custom values for a record | `GET /api/v1/ddic/extensions?tableName=X&recordId=1` | Returns all Z-field values |
+| Create a dropdown lookup | `POST /api/v1/ddic/search-helps` | Must reference a table definition ID |
+| List only CONCEPTUAL tables | `GET /api/v1/ddic/tables?schemaLevel=CONCEPTUAL` | Filter by schema level |
+| List only Z-fields in a table | `GET /api/v1/ddic/fields?tableDefinitionId=1&extensionsOnly=true` | Shows only extension fields |
 
 ---
 
