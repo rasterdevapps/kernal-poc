@@ -42,3 +42,15 @@ erp:
       enabled: false
     sso:
       enabled: false
+  resilience:
+    backup:
+      enabled: true
+      retention-days: 7
+      storage-path: /tmp/erp-backups
+    disaster-recovery:
+      rpo-minutes: 60
+      rto-minutes: 240
+      replication-target: ""
+    monitoring:
+      metrics-enabled: true
+      tracing-enabled: false

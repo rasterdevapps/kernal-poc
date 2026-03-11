@@ -48,3 +48,19 @@ erp:
       enabled: false
     sso:
       enabled: false
+  resilience:
+    circuit-breaker:
+      failure-threshold: 5
+      half-open-max-calls: 3
+      open-state-duration-seconds: 60
+    backup:
+      enabled: true
+      retention-days: 7
+      storage-path: /tmp/erp-test-backups
+    disaster-recovery:
+      rpo-minutes: 60
+      rto-minutes: 240
+      replication-target: ""
+    monitoring:
+      metrics-enabled: true
+      tracing-enabled: false

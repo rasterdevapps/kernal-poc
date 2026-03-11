@@ -49,3 +49,15 @@ erp:
       client-id: ${SSO_CLIENT_ID:}
       client-secret: ${SSO_CLIENT_SECRET:}
       metadata-url: ${SSO_METADATA_URL:}
+  resilience:
+    backup:
+      enabled: ${BACKUP_ENABLED:true}
+      retention-days: ${BACKUP_RETENTION_DAYS:30}
+      storage-path: ${BACKUP_STORAGE_PATH:/var/erp/backups}
+    disaster-recovery:
+      rpo-minutes: ${DR_RPO_MINUTES:60}
+      rto-minutes: ${DR_RTO_MINUTES:240}
+      replication-target: ${DR_REPLICATION_TARGET:}
+    monitoring:
+      metrics-enabled: ${METRICS_ENABLED:true}
+      tracing-enabled: ${TRACING_ENABLED:false}

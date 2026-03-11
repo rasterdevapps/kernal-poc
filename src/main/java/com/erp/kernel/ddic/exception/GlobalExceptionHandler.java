@@ -1,6 +1,7 @@
 package com.erp.kernel.ddic.exception;
 
 import com.erp.kernel.api.ratelimit.RateLimitExceededException;
+import com.erp.kernel.resilience.circuitbreaker.CircuitBreakerOpenException;
 import com.erp.kernel.security.exception.AccountLockedException;
 import com.erp.kernel.security.exception.AuthenticationException;
 import com.erp.kernel.security.exception.AuthorizationException;
@@ -128,6 +129,33 @@ public class GlobalExceptionHandler {
             final RateLimitExceededException ex) {
         LOG.warn("Rate limit exceeded: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(new ErrorResponse(ex.getMessage()));
+    }
+
+    /**
+     * Handles illegal state exceptions, such as verifying a non-completed backup.
+     *
+     * @param ex the exception
+     * @return a 409 response with the error message
+     */
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalState(final IllegalStateException ex) {
+        LOG.warn("Illegal state: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse(ex.getMessage()));
+    }
+
+    /**
+     * Handles circuit breaker open exceptions, returned when a service is unavailable.
+     *
+     * @param ex the exception
+     * @return a 503 response with the error message
+     */
+    @ExceptionHandler(CircuitBreakerOpenException.class)
+    public ResponseEntity<ErrorResponse> handleCircuitBreakerOpen(
+            final CircuitBreakerOpenException ex) {
+        LOG.warn("Circuit breaker open: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                 .body(new ErrorResponse(ex.getMessage()));
     }
 }
