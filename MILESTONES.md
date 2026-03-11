@@ -109,7 +109,7 @@
 
 | # | Milestone | Description | Status |
 |---|-----------|-------------|--------|
-| 9.1 | **ERP Development Environment** | Package the full framework (database abstraction, data types, number ranges, security, APIs) as a reusable ERP development platform. | ⬜ Not Started |
+| 9.1 | **ERP Development Environment** | Package the full framework (database abstraction, data types, number ranges, security, APIs) as a reusable ERP development platform. | 🔄 In Progress |
 | 9.2 | **Plugin & Extension Architecture** | Design a plugin system allowing vertical-specific modules (One Health, manufacturing, retail, etc.) to be developed and deployed independently. | ⬜ Not Started |
 | 9.3 | **Framework Documentation** | Produce comprehensive developer documentation, architecture decision records (ADRs), and onboarding guides. | ⬜ Not Started |
 | 9.4 | **Multi-Vertical Readiness** | Validate the framework against at least two industry verticals (e.g., One Health + another) to confirm reusability and extensibility. | ⬜ Not Started |
